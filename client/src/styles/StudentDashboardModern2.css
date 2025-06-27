@@ -1,0 +1,530 @@
+/* Modern Student Dashboard Styles 2023 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Main Colors */
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #e0e7ff;
+  --secondary: #ec4899;
+  --secondary-light: #fce7f3;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --info: #3b82f6;
+  --info-light: #dbeafe;
+
+  /* Neutral Colors */
+  --dark: #1f2937;
+  --gray-900: #111827;
+  --gray-800: #1f2937;
+  --gray-700: #374151;
+  --gray-600: #4b5563;
+  --gray-500: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-300: #d1d5db;
+  --gray-200: #e5e7eb;
+  --gray-100: #f3f4f6;
+  --gray-50: #f9fafb;
+  --white: #ffffff;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Styles */
+.student-dashboard {
+  font-family: 'Inter', sans-serif;
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.03) 0px, transparent 50%);
+  min-height: 100vh;
+  padding: var(--space-xl);
+  color: var(--gray-800);
+}
+
+/* Dashboard Header */
+.dashboard-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0 0 var(--space-xl) 0;
+  position: relative;
+  display: inline-block;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.dashboard-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+  animation: slideInLeft 1s ease-out;
+}
+
+/* Dashboard Content */
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-xl);
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Charts Container */
+.charts-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  animation: slideInUp 0.8s ease-out;
+}
+
+.chart-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-lg);
+  transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+  height: 350px;
+}
+
+.chart-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.chart-card.no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+.chart-card.overall-attendance {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.attendance-percentage-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+}
+
+.percentage-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.percentage-label {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin-top: var(--space-xs);
+}
+
+/* Dashboard Sidebar */
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  animation: slideInRight 0.8s ease-out;
+}
+
+.recent-attendance,
+.borrowed-books,
+.notices-widget {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-lg);
+  transition: var(--transition-normal);
+}
+
+.recent-attendance:hover,
+.borrowed-books:hover,
+.notices-widget:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.recent-attendance h2,
+.borrowed-books h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin: 0 0 var(--space-lg) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.recent-attendance h2 .icon,
+.borrowed-books h2 .icon {
+  color: var(--primary);
+}
+
+/* Attendance List */
+.attendance-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.attendance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background-color: var(--gray-50);
+  transition: var(--transition-fast);
+}
+
+.attendance-item:hover {
+  background-color: var(--primary-light);
+}
+
+.attendance-item.present {
+  border-left: 3px solid var(--success);
+}
+
+.attendance-item.absent {
+  border-left: 3px solid var(--danger);
+}
+
+.attendance-info {
+  flex: 1;
+}
+
+.attendance-date,
+.attendance-subject {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+}
+
+.attendance-date {
+  color: var(--gray-600);
+  margin-bottom: var(--space-xs);
+}
+
+.attendance-subject {
+  font-weight: 500;
+  color: var(--gray-800);
+}
+
+.attendance-status {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.attendance-item.present .attendance-status {
+  background-color: var(--success-light);
+  color: var(--success);
+}
+
+.attendance-item.absent .attendance-status {
+  background-color: var(--danger-light);
+  color: var(--danger);
+}
+
+/* Books List */
+.books-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.book-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background-color: var(--gray-50);
+  transition: var(--transition-fast);
+}
+
+.book-item:hover {
+  background-color: var(--primary-light);
+}
+
+.book-info {
+  flex: 1;
+}
+
+.book-title,
+.book-due-date {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+}
+
+.book-title {
+  font-weight: 500;
+  color: var(--gray-800);
+  margin-bottom: var(--space-xs);
+}
+
+.book-due-date {
+  color: var(--gray-600);
+}
+
+.book-status {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.book-status.issued {
+  background-color: var(--warning-light);
+  color: var(--warning);
+}
+
+.book-status.overdue {
+  background-color: var(--danger-light);
+  color: var(--danger);
+}
+
+.book-status.returned {
+  background-color: var(--success-light);
+  color: var(--success);
+}
+
+/* Widget Actions */
+.widget-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: var(--transition-normal);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.no-data-text {
+  color: var(--gray-500);
+  font-style: italic;
+  text-align: center;
+  margin: var(--space-lg) 0;
+}
+
+/* Loading Styles */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--primary-light);
+  border-radius: 50%;
+  border-top: 4px solid var(--primary);
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--space-md);
+}
+
+.loading-container p {
+  color: var(--gray-600);
+  font-size: 1rem;
+  margin-top: var(--space-md);
+}
+
+/* Alert Styles */
+.alert {
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+  font-size: 0.9375rem;
+}
+
+.alert-danger {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  border-left: 4px solid var(--danger);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-container {
+    order: 2;
+  }
+
+  .dashboard-sidebar {
+    order: 1;
+    margin-bottom: var(--space-lg);
+  }
+}
+
+@media (max-width: 992px) {
+  .student-dashboard {
+    padding: var(--space-lg);
+  }
+
+  .chart-card {
+    height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .student-dashboard {
+    padding: var(--space-md);
+  }
+
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+
+  .chart-card {
+    height: 250px;
+  }
+
+  .percentage-value {
+    font-size: 2rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .student-dashboard {
+    padding: var(--space-md) var(--space-sm);
+  }
+
+  .dashboard-title {
+    font-size: 1.25rem;
+  }
+
+  .chart-card {
+    height: 200px;
+    padding: var(--space-md);
+  }
+
+  .recent-attendance,
+  .borrowed-books,
+  .notices-widget {
+    padding: var(--space-md);
+  }
+
+  .attendance-item,
+  .book-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .attendance-status,
+  .book-status {
+    margin-top: var(--space-sm);
+    align-self: flex-start;
+  }
+}

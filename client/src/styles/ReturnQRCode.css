@@ -1,0 +1,240 @@
+/* Return QR Code Modal */
+.return-qr-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  backdrop-filter: blur(5px);
+}
+
+.return-qr-container {
+  background-color: var(--card-bg-color);
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--hover-shadow);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.return-qr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--primary-gradient);
+  color: white;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.return-qr-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: white;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.return-qr-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* Book Info */
+.book-info {
+  text-align: center;
+  width: 100%;
+  background-color: var(--light-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.book-info h3 {
+  margin: 0 0 1rem;
+  color: var(--dark-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.book-info p {
+  margin: 0.5rem 0;
+  color: var(--secondary-color);
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Status Indicators */
+.status {
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--border-radius);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+.status.issued {
+  color: var(--warning-color);
+  background-color: var(--warning-light);
+}
+
+.status.returned {
+  color: var(--success-color);
+  background-color: var(--success-light);
+}
+
+.status.overdue {
+  color: var(--danger-color);
+  background-color: var(--danger-light);
+}
+
+/* QR Code Container */
+.qr-code-container {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  justify-content: center;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.qr-code-container::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 2px dashed var(--primary-light);
+  border-radius: calc(var(--border-radius-lg) + 5px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Return Instructions */
+.return-instructions {
+  text-align: center;
+  width: 100%;
+  padding: 1.5rem;
+  background-color: var(--light-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.return-instructions p {
+  margin-bottom: 1.25rem;
+  color: var(--secondary-color);
+  font-size: 1.05rem;
+}
+
+.return-instructions button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--button-shadow);
+}
+
+.return-instructions button:hover {
+  background: linear-gradient(135deg, var(--primary-dark), var(--accent-dark));
+  transform: translateY(-3px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+  .return-qr-overlay {
+    padding: 1rem;
+  }
+
+  .return-qr-header {
+    padding: 1rem 1.5rem;
+  }
+
+  .return-qr-content {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .book-info {
+    padding: 1rem;
+  }
+
+  .book-info h3 {
+    font-size: 1.25rem;
+  }
+
+  .qr-code-container {
+    padding: 1rem;
+  }
+
+  .qr-code-container canvas {
+    width: 180px !important;
+    height: 180px !important;
+  }
+}

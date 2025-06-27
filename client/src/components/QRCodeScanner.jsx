@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
-const QRCodeScanner = ({ onScanSuccess, onScanError }) => {
+const QRCodeScanner = ({ onScanSuccess, onScanError, autoStart = false }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [scannerInstance, setScannerInstance] = useState(null);
   const [cameraId, setCameraId] = useState(null);
@@ -19,6 +19,11 @@ const QRCodeScanner = ({ onScanSuccess, onScanError }) => {
         if (devices && devices.length) {
           setCameras(devices);
           setCameraId(devices[0].id); // Select the first camera by default
+          
+          // Auto-start scanner if prop is true
+          if (autoStart) {
+            setTimeout(() => startScanner(), 500);
+          }
         } else {
           setError('No cameras found on this device');
         }
@@ -35,7 +40,7 @@ const QRCodeScanner = ({ onScanSuccess, onScanError }) => {
           .catch(err => console.error('Error stopping scanner:', err));
       }
     };
-  }, []);
+  }, [autoStart]);
 
   const startScanner = () => {
     if (!scannerInstance || !cameraId) return;
@@ -151,3 +156,4 @@ const QRCodeScanner = ({ onScanSuccess, onScanError }) => {
 };
 
 export default QRCodeScanner;
+

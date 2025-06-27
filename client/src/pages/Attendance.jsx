@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
-import { FaCalendarAlt, FaQrcode, FaCheck, FaTimes, FaUserGraduate, FaCamera, FaBook, FaPlus } from 'react-icons/fa';
+import { FaCalendarAlt, FaQrcode, FaCheck, FaTimes, FaUserGraduate, FaCamera, FaBook, FaPlus, FaSave, FaDatabase } from 'react-icons/fa';
 import { Html5Qrcode } from 'html5-qrcode';
 import '../styles/Attendance.css';
 
@@ -107,8 +107,30 @@ const Attendance = () => {
     }
   };
 
-  const fetchAttendanceData = async () => {
+  const fetchAttendanceData = async (forceRefresh = false, retryCount = 0) => {
     if (!token) return;
+
+    // Log if this is a forced refresh
+    if (forceRefresh) {
+      console.log('FORCE REFRESH: Fetching fresh attendance data');
+    }
+
+    // Log if this is a retry
+    if (retryCount > 0) {
+      console.log(`RETRY ATTEMPT ${retryCount}: Re-fetching attendance data`);
+    }
+
+    // IMPORTANT: Use the exact date string from the state
+    // Do NOT create a new Date object as it can cause timezone issues
+    const exactDate = selectedDate; // Use the raw date string
+    console.log(`Using exact date for fetch: ${exactDate}`);
+
+    // Log the date components for debugging
+    const dateComponents = selectedDate.split('-');
+    console.log(`Date components: Year=${dateComponents[0]}, Month=${dateComponents[1]}, Day=${dateComponents[2]}`);
+
+    // Store the current date we're fetching for validation later
+    const requestedDate = exactDate;
 
     try {
       setLoading(true);
@@ -153,13 +175,67 @@ const Attendance = () => {
       console.log('Found branch:', userBranch);
 
       try {
+        console.log(`Fetching fresh attendance data for date: ${exactDate}, semester: ${selectedSemester}, subject: ${selectedSubject}`);
+
+        // Add a timestamp parameter to prevent caching when force refreshing
+        const cacheBuster = `&_t=${new Date().getTime()}`; // Always use cache buster
+
         const res = await axios.get(
-          `/api/attendance/date/${selectedDate}/semester/${selectedSemester}?subjectId=${selectedSubject}`
+          `/api/attendance/date/${exactDate}/semester/${selectedSemester}?subjectId=${selectedSubject}${cacheBuster}`
         );
 
         console.log('Attendance data received:', res.data);
         console.log('Students found:', res.data.attendanceData?.length || 0);
+        console.log('Date from server:', res.data.date);
 
+        // IMPORTANT: Get the raw date string from the server response
+        // This is critical to ensure we're comparing the same format
+        const rawResponseDate = res.data.date;
+        console.log(`Raw date from server: ${rawResponseDate}`);
+
+        // Convert server date to YYYY-MM-DD format for comparison
+        // We need to handle potential timezone issues
+        const responseDate = new Date(rawResponseDate);
+
+        // Format the response date to match the input format (YYYY-MM-DD)
+        const responseDateFormatted = responseDate.getFullYear() + '-' +
+                                     String(responseDate.getMonth() + 1).padStart(2, '0') + '-' +
+                                     String(responseDate.getDate()).padStart(2, '0');
+
+        console.log(`Formatted response date: ${responseDateFormatted}`);
+        console.log(`Comparing with requested date: ${exactDate}`);
+
+        // Extract just the date part for comparison (ignore time)
+        const requestedDateParts = exactDate.split('-');
+        const responseDateParts = responseDateFormatted.split('-');
+
+        // Check if the dates match (year, month, day)
+        const datesMatch = requestedDateParts[0] === responseDateParts[0] &&
+                          requestedDateParts[1] === responseDateParts[1] &&
+                          requestedDateParts[2] === responseDateParts[2];
+
+        if (!datesMatch) {
+          console.warn(`DATE MISMATCH ERROR! Requested: ${exactDate}, Received: ${responseDateFormatted}`);
+          console.warn(`Date parts - Requested: [${requestedDateParts.join(', ')}], Received: [${responseDateParts.join(', ')}]`);
+
+          // If this is not already a retry and the dates don't match, try again
+          if (retryCount < 2) {
+            console.log(`Retrying fetch for date ${exactDate} due to date mismatch`);
+            setLoading(false);
+            // Wait a moment before retrying
+            setTimeout(() => {
+              fetchAttendanceData(true, retryCount + 1);
+            }, 500);
+            return;
+          } else {
+            // If we've already retried, show an error
+            setError(`Error: Received data for ${responseDateFormatted} instead of ${exactDate}. Please try selecting the date again.`);
+          }
+        } else {
+          console.log(`Date validation successful: Requested and received date match`);
+        }
+
+        // Set the attendance data with the fresh data from the server
         setAttendanceData(res.data);
         setError('');
       } catch (fetchErr) {
@@ -183,11 +259,82 @@ const Attendance = () => {
   };
 
   const handleSemesterChange = (e) => {
+    // Clear attendance data when semester changes
+    setAttendanceData(null);
     setSelectedSemester(parseInt(e.target.value));
+    // This will trigger a fetch of subjects for the new semester
   };
 
   const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
+    // Get the raw date string from the date picker
+    const newDate = e.target.value;
+    console.log('Date changed to:', newDate);
+
+    // IMPORTANT: Use the exact date string from the date picker
+    // Do NOT create a new Date object as it can cause timezone issues
+    const exactDate = newDate; // Use the raw date string
+    console.log(`Using exact date from picker: ${exactDate}`);
+
+    // Log the date components for debugging
+    const dateComponents = newDate.split('-');
+    console.log(`Date components: Year=${dateComponents[0]}, Month=${dateComponents[1]}, Day=${dateComponents[2]}`);
+
+    // Validate the date (don't allow future dates)
+    // Create date objects at noon to avoid timezone issues
+    const year = parseInt(dateComponents[0]);
+    const month = parseInt(dateComponents[1]) - 1; // JS months are 0-indexed
+    const day = parseInt(dateComponents[2]);
+
+    // Create date at noon to avoid timezone issues
+    const selectedDateObj = new Date(year, month, day, 12, 0, 0);
+
+    const today = new Date();
+    today.setHours(12, 0, 0, 0); // Set to noon
+
+    // IMPORTANT: Force clear the attendance data when changing dates
+    // This is critical to prevent showing stale data from a previous date
+    setAttendanceData(null);
+    console.log('RESET: Cleared attendance data due to date change');
+
+    // Show a loading message to indicate data is being refreshed
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    if (selectedDateObj > today) {
+      // If future date selected, set to today
+      const todayStr = today.toISOString().split('T')[0];
+      setSelectedDate(todayStr);
+      console.log('Future date selected, setting to today:', todayStr);
+
+      // Show a message to the user
+      setError('Future dates are not allowed. Date set to today.');
+
+      // If we have a subject selected, fetch attendance data
+      if (selectedSubject) {
+        // Use a longer timeout to ensure state is fully updated
+        setTimeout(() => {
+          console.log('Fetching attendance data for today after future date was selected');
+          fetchAttendanceData(true); // Pass true to force refresh
+        }, 500); // Increased timeout for better reliability
+      } else {
+        setLoading(false);
+      }
+    } else {
+      // Valid date selected - use the exact date string
+      setSelectedDate(exactDate);
+
+      // If we have a subject selected, fetch attendance data for the new date
+      if (selectedSubject) {
+        // Use a longer timeout to ensure state is fully updated
+        setTimeout(() => {
+          console.log('Fetching attendance data for new date:', exactDate);
+          fetchAttendanceData(true); // Pass true to force refresh
+        }, 500); // Increased timeout for better reliability
+      } else {
+        setLoading(false);
+      }
+    }
   };
 
   const handleScanClick = () => {
@@ -256,7 +403,7 @@ const Attendance = () => {
     setScannerError('Error scanning QR code: ' + err.message);
   };
 
-  const handleScan = async (decodedText, decodedResult) => {
+  const handleScan = async (decodedText) => {
     if (!decodedText) return;
 
     // If this is the same QR code we just scanned, ignore it
@@ -380,15 +527,77 @@ const Attendance = () => {
       }
 
       try {
-        const res = await axios.post('/api/attendance', {
+        // IMPORTANT: Use the exact date string from the state
+        // Do NOT create a new Date object as it can cause timezone issues
+        const exactDate = selectedDate; // Use the raw date string
+        console.log(`Marking attendance for date: ${exactDate}`);
+
+        // Log the date components for debugging
+        const dateComponents = selectedDate.split('-');
+        console.log(`Date components: Year=${dateComponents[0]}, Month=${dateComponents[1]}, Day=${dateComponents[2]}`);
+
+        // Add a timestamp to prevent caching issues
+        const timestamp = new Date().getTime();
+
+        const res = await axios.post(`/api/attendance?_t=${timestamp}`, {
           studentId,
-          date: selectedDate,
+          date: exactDate, // Use the exact date string
           present,
           subjectId: selectedSubject
         });
 
+        console.log('Attendance response:', res.data);
+
+        // Check if the attendance was already marked with the same status
+        if (res.data.updated === false) {
+          console.log('Attendance already marked with the same status');
+          setSuccessMessage(`Student already marked as ${present ? 'present' : 'absent'}`);
+
+          // Return true to indicate success, but we didn't actually change anything
+          return true;
+        }
+
+        // IMPORTANT: Get the raw date string from the server response
+        const rawResponseDate = res.data.attendance.date;
+        console.log(`Raw date from server response: ${rawResponseDate}`);
+
+        // Convert server date to YYYY-MM-DD format for comparison
+        const responseDate = new Date(rawResponseDate);
+
+        // Format the response date to match the input format (YYYY-MM-DD)
+        const responseDateFormatted = responseDate.getFullYear() + '-' +
+                                     String(responseDate.getMonth() + 1).padStart(2, '0') + '-' +
+                                     String(responseDate.getDate()).padStart(2, '0');
+
+        console.log(`Formatted response date: ${responseDateFormatted}`);
+        console.log(`Comparing with requested date: ${exactDate}`);
+
+        // Extract just the date part for comparison (ignore time)
+        const requestedDateParts = exactDate.split('-');
+        const responseDateParts = responseDateFormatted.split('-');
+
+        // Check if the dates match (year, month, day)
+        const datesMatch = requestedDateParts[0] === responseDateParts[0] &&
+                          requestedDateParts[1] === responseDateParts[1] &&
+                          requestedDateParts[2] === responseDateParts[2];
+
+        if (!datesMatch) {
+          console.warn(`DATE MISMATCH ERROR! Requested: ${exactDate}, Received: ${responseDateFormatted}`);
+          console.warn(`Date parts - Requested: [${requestedDateParts.join(', ')}], Received: [${responseDateParts.join(', ')}]`);
+        } else {
+          console.log(`Date validation successful: Requested and received date match`);
+        }
+
         console.log('Attendance marked successfully:', res.data);
-        setSuccessMessage(res.data.msg);
+
+        // Show appropriate success message based on whether it was created or updated
+        if (res.data.created) {
+          setSuccessMessage(`Student marked as ${present ? 'present' : 'absent'}`);
+        } else if (res.data.updated) {
+          setSuccessMessage(`Student attendance updated to ${present ? 'present' : 'absent'}`);
+        } else {
+          setSuccessMessage(res.data.msg);
+        }
 
         // Update the UI directly
         setAttendanceData(prevData => {
@@ -571,8 +780,126 @@ const Attendance = () => {
   };
 
   const formatDate = (dateString) => {
+    // CRITICAL FIX: Handle date formatting carefully to avoid timezone issues
+    console.log(`Formatting date: ${dateString}`);
+
+    // IMPORTANT: Check for exactDate or dateString properties from the server
+    if (typeof dateString === 'object') {
+      if (dateString.exactDate) {
+        console.log(`Using exactDate property: ${dateString.exactDate}`);
+        return formatExactDateString(dateString.exactDate);
+      } else if (dateString.dateString) {
+        console.log(`Using dateString property: ${dateString.dateString}`);
+        return formatExactDateString(dateString.dateString);
+      }
+    }
+
+    // If it's a simple string, use it directly
+    if (typeof dateString === 'string') {
+      return formatExactDateString(dateString);
+    }
+
+    // If it's a Date object, format it carefully
+    if (dateString instanceof Date) {
+      const year = dateString.getFullYear();
+      const month = dateString.getMonth() + 1; // JS months are 0-indexed
+      const day = dateString.getDate();
+
+      // Create a formatted date string
+      const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      return formatExactDateString(formattedDate);
+    }
+
+    // Fallback for unknown formats
+    console.warn(`Invalid date format: ${dateString}`);
+    return String(dateString);
+  };
+
+  // Helper function to format an exact date string
+  const formatExactDateString = (exactDateStr) => {
+    console.log(`Formatting exact date string: ${exactDateStr}`);
+
+    // Parse the date parts directly
+    const dateParts = exactDateStr.split('T')[0].split('-');
+
+    if (dateParts.length !== 3) {
+      console.warn(`Invalid date parts: ${dateParts.join(', ')}`);
+      return exactDateStr;
+    }
+
+    // Create a date object with the date parts
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1; // Subtract 1 for JS Date month (0-11)
+    const day = parseInt(dateParts[2]);
+
+    // Format the date using the browser's locale
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+
+    try {
+      // Use Intl.DateTimeFormat for more reliable formatting
+      return new Intl.DateTimeFormat(undefined, options).format(new Date(year, month, day));
+    } catch (err) {
+      console.error('Error formatting date:', err);
+      return `${day}/${month + 1}/${year}`; // Fallback format
+    }
+  };
+
+  // Function to save all attendance data to database
+  const saveAttendanceToDatabase = async () => {
+    if (!attendanceData || !attendanceData.attendanceData) {
+      setError('No attendance data to save');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      setSuccessMessage('');
+
+      // Set up axios headers
+      axios.defaults.headers.common['x-auth-token'] = token;
+
+      // Get the subject name for logging
+      const subjectName = subjects.find(s => s._id === selectedSubject)?.name || 'Unknown';
+
+      console.log(`Saving attendance for ${attendanceData.attendanceData.length} students for subject ${subjectName} on ${selectedDate}`);
+
+      // IMPORTANT: Use the exact date string from the state
+      // Do NOT create a new Date object as it can cause timezone issues
+      const exactDate = selectedDate; // Use the raw date string
+      console.log(`Using exact date for batch save: ${exactDate}`);
+
+      // Log the date components for debugging
+      const dateComponents = selectedDate.split('-');
+      console.log(`Date components: Year=${dateComponents[0]}, Month=${dateComponents[1]}, Day=${dateComponents[2]}`);
+
+      // Create an array of attendance records to save
+      const attendanceRecords = attendanceData.attendanceData.map(item => ({
+        studentId: item.student._id,
+        date: exactDate, // Use the exact date string
+        present: item.attendance?.present || false,
+        subjectId: selectedSubject
+      }));
+
+      // Add a timestamp to prevent caching issues
+      const timestamp = new Date().getTime();
+
+      // Send the batch update request
+      const res = await axios.post(`/api/attendance/batch?_t=${timestamp}`, {
+        records: attendanceRecords
+      });
+
+      console.log('Attendance saved successfully:', res.data);
+      setSuccessMessage('Attendance data saved to database successfully!');
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error saving attendance data:', err);
+      setError('Failed to save attendance data: ' + (err.response?.data?.msg || err.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -606,7 +933,15 @@ const Attendance = () => {
             <select
               id="subject"
               value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
+              onChange={(e) => {
+                // Clear attendance data when subject changes
+                setAttendanceData(null);
+                setSelectedSubject(e.target.value);
+                // If a valid subject is selected, fetch attendance data
+                if (e.target.value) {
+                  setTimeout(() => fetchAttendanceData(true), 300); // Force refresh when subject changes
+                }
+              }}
               disabled={subjects.length === 0}
               className="subject-select"
             >
@@ -628,14 +963,23 @@ const Attendance = () => {
         </div>
 
         <div className="filter-group">
-          <label htmlFor="date">Date:</label>
-          <input
-            type="date"
-            id="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-            max={new Date().toISOString().split('T')[0]}
-          />
+          <label htmlFor="date"><FaCalendarAlt className="icon" /> Date:</label>
+          <div className="date-input-container">
+            <div className="relative">
+              <input
+                type="date"
+                id="date"
+                value={selectedDate}
+                onChange={handleDateChange}
+                max={new Date().toISOString().split('T')[0]}
+                title="Select a date to view attendance records"
+                className="date-input w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-400 transition-colors duration-200"
+              />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 pointer-events-none">
+                <FaCalendarAlt />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -644,7 +988,7 @@ const Attendance = () => {
       ) : attendanceData ? (
         <div className="attendance-container">
           <div className="attendance-header">
-            <h2>Attendance for {formatDate(attendanceData.date)}</h2>
+            <h2>Attendance for {formatDate(attendanceData.exactDate || attendanceData.dateString || attendanceData.date)}</h2>
             <h3>
               <FaBook className="icon" /> Subject: {
                 subjects.find(s => s._id === selectedSubject)?.name || 'Not selected'
@@ -678,14 +1022,35 @@ const Attendance = () => {
           {attendanceData.attendanceData && attendanceData.attendanceData.length > 0 ? (
             <>
               <div className="attendance-actions-bar">
-                <button
-                  className="btn btn-primary"
-                  onClick={handleScanClick}
-                >
-                  <FaQrcode /> Scan Student QR Code
-                </button>
+                <div className="flex flex-wrap gap-4 justify-center mb-2">
+                  <button
+                    className="flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors duration-200 shadow-md"
+                    onClick={handleScanClick}
+                  >
+                    <FaQrcode className="mr-2" /> Scan Student QR Code
+                  </button>
+
+                  <button
+                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 shadow-md"
+                    onClick={saveAttendanceToDatabase}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <FaSave className="mr-2" /> Save Attendance to Database
+                      </>
+                    )}
+                  </button>
+                </div>
+
                 <p className="attendance-help-text">
                   Scan a student's QR code to mark them present, or use the buttons below to mark attendance manually.
+                  Click "Save Attendance to Database" to permanently save all attendance records.
                 </p>
               </div>
 

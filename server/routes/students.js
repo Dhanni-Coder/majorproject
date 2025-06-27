@@ -1,9 +1,14 @@
 const express = require('express');
 const { check } = require('express-validator');
 const studentController = require('../controllers/studentController');
-const { auth, teacherAuth, adminAuth } = require('../middleware/auth');
+const { auth, teacherAuth, adminAuth, studentAuth } = require('../middleware/auth');
 
 const router = express.Router();
+
+// @route   GET api/students/dashboard
+// @desc    Get student dashboard data
+// @access  Private (Student only)
+router.get('/dashboard', auth, studentController.getStudentDashboard);
 
 // @route   POST api/students
 // @desc    Create a new student

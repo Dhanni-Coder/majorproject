@@ -49,13 +49,24 @@ const StudentAttendance = () => {
                 const attendanceRes = await axios.get(`/api/attendance/student/${user.id}`);
                 console.log('Attendance records:', attendanceRes.data);
 
+                // Check if the response has attendanceRecords property or is an array directly
+                let records = [];
+                if (Array.isArray(attendanceRes.data)) {
+                  records = attendanceRes.data;
+                } else if (attendanceRes.data && Array.isArray(attendanceRes.data.attendanceRecords)) {
+                  records = attendanceRes.data.attendanceRecords;
+                } else {
+                  console.error('Unexpected attendance data format:', attendanceRes.data);
+                  records = [];
+                }
+
                 // Log each record to check the present field
                 console.log('Attendance records details:');
-                attendanceRes.data.forEach(record => {
+                records.forEach(record => {
                   console.log(`Record ID: ${record._id}, Date: ${record.date}, Present: ${record.present}, Subject: ${record.subject?.name || 'Unknown'}`);
                 });
 
-                setAttendanceRecords(attendanceRes.data || []);
+                setAttendanceRecords(records);
               } else {
                 console.error('User ID is undefined');
                 setError('User ID is undefined. Please log in again.');
@@ -77,7 +88,16 @@ const StudentAttendance = () => {
               try {
                 if (user && user.id) {
                   const attendanceRes = await axios.get(`/api/attendance/student/${user.id}`);
-                  setAttendanceRecords(attendanceRes.data || []);
+
+                  // Check if the response has attendanceRecords property or is an array directly
+                  if (Array.isArray(attendanceRes.data)) {
+                    setAttendanceRecords(attendanceRes.data);
+                  } else if (attendanceRes.data && Array.isArray(attendanceRes.data.attendanceRecords)) {
+                    setAttendanceRecords(attendanceRes.data.attendanceRecords);
+                  } else {
+                    console.error('Unexpected attendance data format:', attendanceRes.data);
+                    setAttendanceRecords([]);
+                  }
                 } else {
                   console.error('User ID is undefined');
                   setError('User ID is undefined. Please log in again.');
@@ -105,7 +125,16 @@ const StudentAttendance = () => {
             try {
               if (user && user.id) {
                 const attendanceRes = await axios.get(`/api/attendance/student/${user.id}`);
-                setAttendanceRecords(attendanceRes.data || []);
+
+                // Check if the response has attendanceRecords property or is an array directly
+                if (Array.isArray(attendanceRes.data)) {
+                  setAttendanceRecords(attendanceRes.data);
+                } else if (attendanceRes.data && Array.isArray(attendanceRes.data.attendanceRecords)) {
+                  setAttendanceRecords(attendanceRes.data.attendanceRecords);
+                } else {
+                  console.error('Unexpected attendance data format:', attendanceRes.data);
+                  setAttendanceRecords([]);
+                }
               } else {
                 console.error('User ID is undefined');
                 setError('User ID is undefined. Please log in again.');
@@ -124,7 +153,17 @@ const StudentAttendance = () => {
 
           // Fetch attendance records
           const attendanceRes = await axios.get(`/api/attendance/student/${studentId}`);
-          setAttendanceRecords(attendanceRes.data);
+          console.log('Attendance response data structure:', JSON.stringify(attendanceRes.data).substring(0, 200) + '...');
+
+          // Check if the response has attendanceRecords property or is an array directly
+          if (Array.isArray(attendanceRes.data)) {
+            setAttendanceRecords(attendanceRes.data);
+          } else if (attendanceRes.data && Array.isArray(attendanceRes.data.attendanceRecords)) {
+            setAttendanceRecords(attendanceRes.data.attendanceRecords);
+          } else {
+            console.error('Unexpected attendance data format:', attendanceRes.data);
+            setAttendanceRecords([]);
+          }
         }
 
         setError('');
@@ -364,38 +403,43 @@ const StudentAttendance = () => {
             <div className="attendance-history">
               <h3><FaTable className="icon" /> Attendance History</h3>
               <div className="attendance-table-container">
-                <table className="attendance-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Subject</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredRecords
-                      .sort((a, b) => new Date(b.date) - new Date(a.date))
-                      .map(record => (
-                        <tr key={record._id} className={record.present ? 'present-row' : 'absent-row'}>
-                          <td className="date-cell">
-                            <FaCalendarAlt className="icon" />
-                            {formatDate(record.date)}
-                          </td>
-                          <td className="subject-cell">
-                            <FaBook className="icon" />
-                            {record.subject?.name || 'Not specified'}
-                          </td>
-                          <td className={`status-cell ${record.present ? 'present' : 'absent'}`}>
-                            {record.present ? (
-                              <><FaCheck className="icon" /> Present</>
-                            ) : (
-                              <><FaTimes className="icon" /> Absent</>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
+                {/* Group records by date */}
+                {Object.entries(
+                  filteredRecords
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .reduce((acc, record) => {
+                      // Format the date to use as a key
+                      const dateKey = formatDate(record.date);
+                      if (!acc[dateKey]) {
+                        acc[dateKey] = [];
+                      }
+                      acc[dateKey].push(record);
+                      return acc;
+                    }, {})
+                )
+                  .map(([date, records]) => (
+                    <div key={date} className="attendance-date-group">
+                      <div className="date-header">
+                        <FaCalendarAlt className="icon" /> {date}
+                      </div>
+                      <div className="subject-records">
+                        {records.map(record => (
+                          <div key={record._id} className={`subject-record ${record.present ? 'present' : 'absent'}`}>
+                            <div className="subject-name">
+                              <FaBook className="icon" /> {record.subject?.name || 'Not specified'}
+                            </div>
+                            <div className={`status-indicator ${record.present ? 'present' : 'absent'}`}>
+                              {record.present ? (
+                                <><FaCheck className="icon" /> Present</>
+                              ) : (
+                                <><FaTimes className="icon" /> Absent</>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           ) : (

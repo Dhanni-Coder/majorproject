@@ -226,9 +226,18 @@ exports.deleteSubject = async (req, res) => {
       return res.status(403).json({ msg: 'Not authorized to delete this subject' });
     }
 
+    // Delete all attendance records associated with this subject
+    const Attendance = require('../models/Attendance');
+    const deletedAttendance = await Attendance.deleteMany({ subject: subject._id });
+    console.log(`Deleted ${deletedAttendance.deletedCount} attendance records for subject ${subject.name} (${subject.code})`);
+
+    // Delete the subject
     await subject.deleteOne();
 
-    res.json({ msg: 'Subject deleted successfully' });
+    res.json({
+      msg: 'Subject deleted successfully',
+      attendanceRecordsDeleted: deletedAttendance.deletedCount
+    });
   } catch (err) {
     console.error('Error deleting subject:', err.message);
 

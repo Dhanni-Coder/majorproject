@@ -1,5 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import AuthContext from '../context/AuthContext';
+import { FaQrcode, FaSync, FaShieldAlt } from 'react-icons/fa';
+import '../styles/QRCode.css';
 
 const QRCode = () => {
   const { getQRCode, regenerateQRCode } = useContext(AuthContext);
@@ -34,9 +36,9 @@ const QRCode = () => {
       setLoading(true);
       setError('');
       setMessage('');
-      
+
       const newQRCode = await regenerateQRCode();
-      
+
       if (newQRCode) {
         setQrCode(newQRCode);
         setMessage('QR code regenerated successfully');
@@ -53,12 +55,12 @@ const QRCode = () => {
   return (
     <div className="qr-code-page">
       <div className="qr-code-container">
-        <h1>Your QR Code</h1>
-        <p className="lead">Use this QR code to login to your account</p>
-        
+        <h1><FaQrcode /> Your QR Code</h1>
+        <p className="lead">Use this QR code to quickly login to your account</p>
+
         {error && <div className="error-message">{error}</div>}
         {message && <div className="success-message">{message}</div>}
-        
+
         {loading ? (
           <div className="loading">Loading QR code...</div>
         ) : (
@@ -70,19 +72,19 @@ const QRCode = () => {
             )}
           </div>
         )}
-        
+
         <div className="qr-code-actions">
-          <button 
-            className="btn btn-primary"
+          <button
             onClick={handleRegenerateQRCode}
             disabled={loading}
           >
+            <FaSync className={loading ? "icon-spin" : ""} />
             {loading ? 'Regenerating...' : 'Regenerate QR Code'}
           </button>
-          
+
           <div className="qr-code-warning">
             <p>
-              <strong>Important:</strong> Keep your QR code secure. Anyone with access to this QR code can log into your account.
+              <FaShieldAlt /> <strong>Security Notice:</strong> Keep your QR code secure. Anyone with access to this QR code can log into your account. Regenerate your QR code if you suspect it has been compromised.
             </p>
           </div>
         </div>

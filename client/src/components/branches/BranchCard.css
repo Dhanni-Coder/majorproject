@@ -1,0 +1,256 @@
+/* Branch Card Styles */
+.branch-card {
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.branch-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
+}
+
+.branch-card-header {
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.branch-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.branch-title {
+  flex: 1;
+}
+
+.branch-title h3 {
+  margin: 0 0 var(--space-1) 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  line-height: 1.3;
+}
+
+.branch-code {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.branch-description {
+  padding: var(--space-5);
+  color: var(--gray-600);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  flex-grow: 1;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.branch-stats {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.branch-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--white);
+}
+
+.student-icon {
+  background: linear-gradient(135deg, var(--info), var(--info-hover));
+}
+
+.teacher-icon {
+  background: linear-gradient(135deg, var(--success), var(--success-hover));
+}
+
+.stat-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  margin-top: var(--space-1);
+}
+
+.branch-actions {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  border-top: 1px solid var(--gray-200);
+}
+
+.branch-action {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border: none;
+  background: none;
+}
+
+.view-action {
+  color: var(--info);
+  background-color: var(--info-light);
+}
+
+.view-action:hover {
+  background-color: var(--info);
+  color: var(--white);
+}
+
+.edit-action {
+  color: var(--warning);
+  background-color: var(--warning-light);
+}
+
+.edit-action:hover {
+  background-color: var(--warning);
+  color: var(--white);
+}
+
+.delete-action {
+  color: var(--danger);
+  background-color: var(--danger-light);
+}
+
+.delete-action:hover {
+  background-color: var(--danger);
+  color: var(--white);
+}
+
+.branch-badge {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.empty-badge {
+  background-color: var(--primary-light);
+  color: var(--primary);
+}
+
+/* List View Styles */
+.branches-list .branch-card {
+  flex-direction: row;
+  align-items: center;
+  padding: var(--space-4);
+  gap: var(--space-4);
+  height: auto;
+}
+
+.branches-list .branch-card-header {
+  padding: 0;
+  border: none;
+  flex: 2;
+}
+
+.branches-list .branch-description {
+  padding: 0;
+  border: none;
+  flex: 3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.branches-list .branch-stats {
+  padding: 0;
+  flex: 2;
+}
+
+.branches-list .branch-actions {
+  padding: 0;
+  border: none;
+  flex: 1;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .branches-list .branch-card {
+    flex-direction: column;
+    padding: var(--space-4);
+  }
+  
+  .branches-list .branch-card-header,
+  .branches-list .branch-description,
+  .branches-list .branch-stats,
+  .branches-list .branch-actions {
+    width: 100%;
+    padding: var(--space-2) 0;
+  }
+  
+  .branches-list .branch-description {
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+  
+  .branches-list .branch-actions {
+    justify-content: flex-start;
+  }
+}

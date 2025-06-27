@@ -1,0 +1,607 @@
+/* Modern Navbar Styles - Redesigned for Government Polytechnic Dehradun */
+:root {
+  --navbar-bg: #ffffff;
+  --navbar-text: #333333;
+  --navbar-hover: #0056b3;
+  --navbar-active: #004494;
+  --navbar-shadow: rgba(0, 0, 0, 0.1);
+  --dropdown-bg: #ffffff;
+  --dropdown-border: rgba(0, 0, 0, 0.08);
+  --dropdown-shadow: rgba(0, 0, 0, 0.15);
+  --dropdown-hover: #f5f9ff;
+  --mobile-menu-bg: #ffffff;
+  --mobile-menu-shadow: rgba(0, 0, 0, 0.2);
+  --divider-color: rgba(0, 0, 0, 0.08);
+  --badge-admin: #ff5722;
+  --badge-teacher: #4caf50;
+  --badge-student: #2196f3;
+  --primary-color: #0056b3;
+  --accent-color: #ff5722;
+  --transition-speed: 0.3s;
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+  --navbar-bg: #1a1a2e;
+  --navbar-text: #e6e6e6;
+  --navbar-hover: #4cc9f0;
+  --navbar-active: #4cc9f0;
+  --navbar-shadow: rgba(0, 0, 0, 0.3);
+  --dropdown-bg: #242444;
+  --dropdown-border: rgba(255, 255, 255, 0.05);
+  --dropdown-shadow: rgba(0, 0, 0, 0.5);
+  --dropdown-hover: #2d2d52;
+  --mobile-menu-bg: #1a1a2e;
+  --mobile-menu-shadow: rgba(0, 0, 0, 0.5);
+  --divider-color: rgba(255, 255, 255, 0.08);
+  --badge-admin: #ff7043;
+  --badge-teacher: #66bb6a;
+  --badge-student: #42a5f5;
+  --primary-color: #4cc9f0;
+  --accent-color: #f72585;
+}
+
+/* Navbar Container */
+.modern-navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--navbar-bg);
+  box-shadow: 0 2px 10px var(--navbar-shadow);
+  z-index: 1000;
+  transition: all var(--transition-speed) ease;
+}
+
+.modern-navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 70px;
+}
+
+/* Logo Styles */
+.modern-navbar-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--navbar-text);
+  font-weight: 700;
+  font-size: 1.2rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.modern-navbar-logo:hover {
+  color: var(--navbar-hover);
+}
+
+.college-logo {
+  height: 45px;
+  width: auto;
+  margin-right: 12px;
+  transition: transform 0.3s ease;
+}
+
+.modern-navbar-logo:hover .college-logo {
+  transform: scale(1.05);
+}
+
+.college-name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.college-name-main {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+}
+
+.college-name-sub {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--navbar-text);
+}
+
+/* Desktop Navigation */
+.modern-navbar-menu {
+  display: flex;
+  align-items: center;
+}
+
+.modern-navbar-nav {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.modern-nav-item {
+  margin: 0 0.2rem;
+  position: relative;
+}
+
+.modern-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  color: var(--navbar-text);
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all var(--transition-speed) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background-color: var(--navbar-active);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+  border-radius: 3px;
+}
+
+.modern-nav-link:hover {
+  color: var(--navbar-hover);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.modern-nav-link:hover::before {
+  width: 70%;
+}
+
+.modern-nav-link.active {
+  color: var(--navbar-active);
+  font-weight: 600;
+}
+
+.modern-nav-link.active::before {
+  width: 70%;
+}
+
+.modern-nav-icon {
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+}
+
+/* User Menu & Dropdown */
+.modern-navbar-actions {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.modern-nav-profile-image {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.5rem;
+  border: 2px solid var(--primary-color);
+}
+
+/* Mobile Menu Toggle */
+.modern-navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--navbar-text);
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  border-radius: 8px;
+  transition: all var(--transition-speed) ease;
+}
+
+.modern-navbar-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--navbar-hover);
+}
+
+.modern-dropdown {
+  position: relative;
+}
+
+.modern-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all var(--transition-speed) ease;
+}
+
+.modern-dropdown-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.dropdown-icon {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  transition: transform var(--transition-speed) ease;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.modern-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 280px;
+  background-color: var(--dropdown-bg);
+  border-radius: 12px;
+  box-shadow: 0 5px 20px var(--dropdown-shadow);
+  border: 1px solid var(--dropdown-border);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all var(--transition-speed) ease;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.modern-dropdown-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-menu-section {
+  padding: 1rem;
+  border-bottom: 1px solid var(--divider-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.user-menu-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-menu-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.75rem;
+  border: 2px solid var(--primary-color);
+}
+
+.user-menu-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--navbar-text);
+}
+
+.user-menu-email {
+  font-size: 0.8rem;
+  color: var(--navbar-text);
+  opacity: 0.7;
+}
+
+.user-role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  align-self: flex-start;
+}
+
+.user-role-badge.admin {
+  background-color: var(--badge-admin);
+  color: white;
+}
+
+.user-role-badge.teacher {
+  background-color: var(--badge-teacher);
+  color: white;
+}
+
+.user-role-badge.student {
+  background-color: var(--badge-student);
+  color: white;
+}
+
+.user-role-badge svg {
+  margin-right: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.modern-dropdown-divider {
+  height: 1px;
+  background-color: var(--divider-color);
+  margin: 0.3rem 0;
+}
+
+.modern-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--navbar-text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.modern-dropdown-item:hover {
+  background-color: var(--dropdown-hover);
+}
+
+.modern-dropdown-item.active {
+  background-color: var(--dropdown-hover);
+  font-weight: 600;
+}
+
+.item-icon {
+  margin-right: 0.75rem;
+  font-size: 1rem;
+  color: var(--primary-color);
+}
+
+/* Mobile Menu Backdrop */
+.modern-mobile-menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-speed) ease;
+}
+
+.modern-mobile-menu-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Mobile Menu */
+.modern-mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 320px;
+  height: 100%;
+  background-color: var(--mobile-menu-bg);
+  box-shadow: -5px 0 20px var(--mobile-menu-shadow);
+  z-index: 1000;
+  transition: all var(--transition-speed) ease;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modern-mobile-menu.open {
+  right: 0;
+}
+
+.modern-mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--divider-color);
+}
+
+.modern-mobile-menu-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--navbar-text);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all var(--transition-speed) ease;
+}
+
+.modern-mobile-menu-close:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--navbar-hover);
+}
+
+.modern-mobile-nav {
+  list-style: none;
+  margin: 0;
+  padding: 1rem;
+  flex: 1;
+}
+
+.modern-mobile-nav-item {
+  margin-bottom: 0.5rem;
+}
+
+.modern-mobile-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--navbar-text);
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all var(--transition-speed) ease;
+}
+
+.modern-mobile-nav-link:hover {
+  background-color: var(--dropdown-hover);
+}
+
+.modern-mobile-nav-link.active {
+  background-color: var(--dropdown-hover);
+  color: var(--navbar-active);
+  font-weight: 600;
+}
+
+.modern-mobile-nav-icon {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+}
+
+.dropdown-category {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--navbar-text);
+  opacity: 0.6;
+  margin: 1.5rem 0 0.5rem 1rem;
+  letter-spacing: 0.5px;
+}
+
+.mobile-theme-toggle {
+  padding: 1rem;
+  border-top: 1px solid var(--divider-color);
+  display: flex;
+  justify-content: center;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .modern-navbar-container {
+    padding: 0.5rem 1rem;
+  }
+
+  .college-name-main {
+    font-size: 1rem;
+  }
+
+  .college-name-sub {
+    font-size: 0.8rem;
+  }
+
+  .modern-nav-link {
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .modern-navbar-nav {
+    display: none;
+  }
+
+  .modern-navbar-toggle {
+    display: block;
+  }
+
+  .modern-navbar-actions {
+    margin-left: auto;
+  }
+
+  .college-logo {
+    height: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-navbar-container {
+    height: 60px;
+  }
+
+  .college-logo {
+    height: 35px;
+  }
+
+  .college-name-main {
+    font-size: 0.9rem;
+  }
+
+  .college-name-sub {
+    font-size: 0.75rem;
+  }
+
+  .modern-dropdown-toggle span {
+    display: none;
+  }
+
+  .dropdown-icon {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .modern-navbar-container {
+    padding: 0.5rem;
+  }
+
+  .college-logo {
+    height: 30px;
+    margin-right: 8px;
+  }
+
+  .modern-mobile-menu {
+    width: 280px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modern-dropdown-menu.open {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Hover Effects */
+.modern-nav-link:hover .modern-nav-icon,
+.modern-mobile-nav-link:hover .modern-mobile-nav-icon {
+  transform: translateY(-2px);
+  transition: transform 0.3s ease;
+}
+
+.modern-dropdown-item:hover .item-icon {
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+/* Auth Loading Spinner */
+.auth-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: var(--primary-color);
+}
+
+.auth-loading .spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

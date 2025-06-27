@@ -58,4 +58,22 @@ router.get(
   attendanceController.getSemesterAttendanceSummary
 );
 
+// @route   GET api/attendance/teacher-data
+// @desc    Get attendance data for the teacher's dashboard
+// @access  Private (Teacher only)
+router.get(
+  '/teacher-data',
+  [auth, teacherAuth],
+  attendanceController.getTeacherAttendanceData
+);
+
+// @route   POST api/attendance/batch
+// @desc    Save batch attendance records
+// @access  Private (Teacher only)
+router.post(
+  '/batch',
+  [auth, teacherAuth],
+  attendanceController.saveBatchAttendance
+);
+
 module.exports = router;

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background elements -->
+  <rect x="50" y="50" width="500" height="300" rx="20" fill="#E0E6FF" />
+  
+  <!-- University building -->
+  <rect x="200" y="150" width="200" height="150" fill="#4361EE" />
+  <rect x="220" y="100" width="160" height="50" fill="#4361EE" />
+  <polygon points="200,150 300,100 400,150" fill="#3A56D4" />
+  
+  <!-- Windows -->
+  <rect x="220" y="170" width="30" height="40" fill="#E0E6FF" />
+  <rect x="270" y="170" width="30" height="40" fill="#E0E6FF" />
+  <rect x="320" y="170" width="30" height="40" fill="#E0E6FF" />
+  <rect x="220" y="230" width="30" height="40" fill="#E0E6FF" />
+  <rect x="270" y="230" width="30" height="40" fill="#E0E6FF" />
+  <rect x="320" y="230" width="30" height="40" fill="#E0E6FF" />
+  
+  <!-- Door -->
+  <rect x="350" y="250" width="30" height="50" fill="#3A56D4" />
+  
+  <!-- Steps -->
+  <rect x="340" y="300" width="50" height="5" fill="#3A56D4" />
+  <rect x="345" y="305" width="40" height="5" fill="#3A56D4" />
+  <rect x="350" y="310" width="30" height="5" fill="#3A56D4" />
+  
+  <!-- Pillars -->
+  <rect x="190" y="150" width="10" height="150" fill="#3A56D4" />
+  <rect x="400" y="150" width="10" height="150" fill="#3A56D4" />
+  
+  <!-- Dome -->
+  <circle cx="300" cy="100" r="30" fill="#3A56D4" />
+  
+  <!-- Flag -->
+  <rect x="300" y="50" width="5" height="50" fill="#333" />
+  <polygon points="305,50 330,60 305,70" fill="#FF6B6B" />
+  
+  <!-- Students -->
+  <circle cx="150" cy="280" r="15" fill="#333" />
+  <rect x="145" y="295" width="10" height="30" fill="#333" />
+  <rect x="135" y="305" width="30" height="5" fill="#333" />
+  <rect x="140" y="325" width="5" height="15" fill="#333" />
+  <rect x="155" y="325" width="5" height="15" fill="#333" />
+  
+  <circle cx="450" cy="280" r="15" fill="#333" />
+  <rect x="445" y="295" width="10" height="30" fill="#333" />
+  <rect x="435" y="305" width="30" height="5" fill="#333" />
+  <rect x="440" y="325" width="5" height="15" fill="#333" />
+  <rect x="455" y="325" width="5" height="15" fill="#333" />
+  
+  <!-- QR Code representation -->
+  <rect x="100" y="100" width="60" height="60" fill="#FFF" stroke="#333" stroke-width="2" />
+  <rect x="110" y="110" width="10" height="10" fill="#333" />
+  <rect x="130" y="110" width="10" height="10" fill="#333" />
+  <rect x="140" y="110" width="10" height="10" fill="#333" />
+  <rect x="110" y="120" width="10" height="10" fill="#333" />
+  <rect x="140" y="120" width="10" height="10" fill="#333" />
+  <rect x="110" y="130" width="10" height="10" fill="#333" />
+  <rect x="130" y="130" width="10" height="10" fill="#333" />
+  <rect x="110" y="140" width="10" height="10" fill="#333" />
+  <rect x="120" y="140" width="10" height="10" fill="#333" />
+  <rect x="140" y="140" width="10" height="10" fill="#333" />
+  
+  <!-- Digital elements -->
+  <rect x="450" y="100" width="80" height="50" rx="5" fill="#FFF" stroke="#333" stroke-width="2" />
+  <line x1="460" y1="115" x2="520" y2="115" stroke="#333" stroke-width="2" />
+  <line x1="460" y1="125" x2="500" y2="125" stroke="#333" stroke-width="2" />
+  <line x1="460" y1="135" x2="510" y2="135" stroke="#333" stroke-width="2" />
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="350" r="20" fill="#FF6B6B" opacity="0.5" />
+  <circle cx="500" cy="350" r="20" fill="#4361EE" opacity="0.5" />
+  <circle cx="150" cy="50" r="20" fill="#2ED573" opacity="0.5" />
+  <circle cx="450" cy="50" r="20" fill="#FF6B6B" opacity="0.5" />
+</svg>

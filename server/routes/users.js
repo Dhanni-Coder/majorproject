@@ -2,6 +2,7 @@ const express = require('express');
 const { check } = require('express-validator');
 const userController = require('../controllers/userController');
 const { auth, adminAuth, teacherAuth } = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -46,8 +47,8 @@ router.post(
 
 // @route   GET api/users/:id
 // @desc    Get user by ID
-// @access  Private (Admin only)
-router.get('/:id', [auth, adminAuth], userController.getUserById);
+// @access  Private (Admin and Teacher)
+router.get('/:id', [auth, teacherAuth], userController.getUserById);
 
 // @route   PUT api/users/:id
 // @desc    Update user
@@ -183,17 +184,33 @@ router.put(
 // @route   GET api/users/me
 // @desc    Get current user
 // @access  Private
-router.get('/me', auth, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select('-password');
-    if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
-    }
-    res.json(user);
-  } catch (err) {
-    console.error('Error getting current user:', err.message);
-    res.status(500).send('Server error');
-  }
-});
+router.get('/me', auth, userController.getCurrentUser);
+
+// @route   PUT api/users/update-profile
+// @desc    Update user profile
+// @access  Private
+router.put(
+  '/update-profile',
+  [
+    auth,
+    [
+      check('name', 'Name is required').optional().not().isEmpty(),
+      check('email', 'Please include a valid email').optional().isEmail(),
+      check('branch', 'Invalid branch').optional().isIn(['CSE', 'IT', 'ME', 'MEA', 'CE', 'EE', 'PHARM', '']),
+      check('semester', 'Semester must be between 1 and 8').optional().isInt({ min: 1, max: 8 })
+    ]
+  ],
+  userController.updateProfile
+);
+
+// @route   PUT api/users/update-profile-picture
+// @desc    Update user profile picture
+// @access  Private
+router.put('/update-profile-picture', auth, upload.single('profilePicture'), userController.updateProfilePicture);
+
+// @route   GET api/users/by-email/:email
+// @desc    Get user by email
+// @access  Private (Admin and Teacher)
+router.get('/by-email/:email', [auth, teacherAuth], userController.getUserByEmail);
 
 module.exports = router;

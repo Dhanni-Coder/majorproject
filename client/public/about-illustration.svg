@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background elements -->
+  <rect x="50" y="50" width="500" height="300" rx="20" fill="#F5F7FF" />
+  
+  <!-- Teacher figure -->
+  <circle cx="200" cy="150" r="30" fill="#4361EE" />
+  <rect x="190" y="180" width="20" height="60" fill="#4361EE" />
+  <rect x="170" y="200" width="60" height="10" fill="#4361EE" />
+  <rect x="180" y="240" width="10" height="30" fill="#4361EE" />
+  <rect x="210" y="240" width="10" height="30" fill="#4361EE" />
+  
+  <!-- Whiteboard/Screen -->
+  <rect x="300" y="120" width="200" height="120" rx="5" fill="#FFF" stroke="#333" stroke-width="2" />
+  <rect x="310" y="130" width="180" height="20" rx="2" fill="#4361EE" opacity="0.2" />
+  <line x1="310" y1="170" x2="490" y2="170" stroke="#333" stroke-width="1" />
+  <line x1="310" y1="190" x2="490" y2="190" stroke="#333" stroke-width="1" />
+  <line x1="310" y1="210" x2="490" y2="210" stroke="#333" stroke-width="1" />
+  
+  <!-- Students -->
+  <circle cx="280" cy="300" r="20" fill="#FF6B6B" />
+  <rect x="275" y="320" width="10" height="30" fill="#FF6B6B" />
+  <rect x="265" y="330" width="30" height="5" fill="#FF6B6B" />
+  <rect x="270" y="350" width="5" height="15" fill="#FF6B6B" />
+  <rect x="285" y="350" width="5" height="15" fill="#FF6B6B" />
+  
+  <circle cx="340" cy="300" r="20" fill="#2ED573" />
+  <rect x="335" y="320" width="10" height="30" fill="#2ED573" />
+  <rect x="325" y="330" width="30" height="5" fill="#2ED573" />
+  <rect x="330" y="350" width="5" height="15" fill="#2ED573" />
+  <rect x="345" y="350" width="5" height="15" fill="#2ED573" />
+  
+  <circle cx="400" cy="300" r="20" fill="#4361EE" />
+  <rect x="395" y="320" width="10" height="30" fill="#4361EE" />
+  <rect x="385" y="330" width="30" height="5" fill="#4361EE" />
+  <rect x="390" y="350" width="5" height="15" fill="#4361EE" />
+  <rect x="405" y="350" width="5" height="15" fill="#4361EE" />
+  
+  <!-- QR Code scanner -->
+  <rect x="120" y="250" width="40" height="60" rx="5" fill="#333" />
+  <rect x="130" y="260" width="20" height="20" fill="#4361EE" />
+  <line x1="130" y1="290" x2="150" y2="290" stroke="#FFF" stroke-width="2" />
+  <line x1="130" y1="300" x2="150" y2="300" stroke="#FFF" stroke-width="2" />
+  
+  <!-- Digital elements -->
+  <rect x="450" y="250" width="80" height="100" rx="10" fill="#FFF" stroke="#333" stroke-width="2" />
+  <rect x="460" y="260" width="60" height="10" rx="2" fill="#4361EE" opacity="0.2" />
+  <rect x="460" y="280" width="60" height="10" rx="2" fill="#4361EE" opacity="0.2" />
+  <rect x="460" y="300" width="60" height="10" rx="2" fill="#4361EE" opacity="0.2" />
+  <rect x="460" y="320" width="60" height="10" rx="2" fill="#4361EE" opacity="0.2" />
+  <circle cx="490" cy="350" r="10" fill="#4361EE" />
+  
+  <!-- Books -->
+  <rect x="100" y="150" width="40" height="10" fill="#FF6B6B" />
+  <rect x="105" y="140" width="40" height="10" fill="#4361EE" />
+  <rect x="110" y="130" width="40" height="10" fill="#2ED573" />
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="20" fill="#FF6B6B" opacity="0.5" />
+  <circle cx="500" cy="100" r="20" fill="#4361EE" opacity="0.5" />
+  <circle cx="150" cy="350" r="20" fill="#2ED573" opacity="0.5" />
+  <circle cx="550" cy="350" r="20" fill="#FF6B6B" opacity="0.5" />
+  
+  <!-- Attendance chart -->
+  <rect x="500" y="150" width="50" height="80" rx="5" fill="#FFF" stroke="#333" stroke-width="1" />
+  <rect x="510" y="160" width="10" height="60" fill="#4361EE" opacity="0.2" />
+  <rect x="530" y="180" width="10" height="40" fill="#4361EE" />
+</svg>

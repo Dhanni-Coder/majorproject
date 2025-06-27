@@ -1,0 +1,217 @@
+/* QR Scanner Styles */
+#qr-reader {
+  width: 100%;
+  margin: 0 auto 2rem;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+#qr-reader img {
+  max-width: 100%;
+}
+
+#qr-reader__scan_region {
+  position: relative;
+}
+
+#qr-reader__scan_region::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#qr-reader__dashboard {
+  padding: 1rem;
+}
+
+#qr-reader__dashboard_section_csr button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.scanner-instructions {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background-color: rgba(var(--primary-color-rgb, 58, 91, 239), 0.05);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.scanner-tips {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: var(--secondary-color);
+}
+
+.scanner-tips li {
+  margin-bottom: 0.5rem;
+}
+
+.scanner-note {
+  margin-top: 1rem;
+  font-style: italic;
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  border-top: 1px dashed rgba(var(--secondary-color-rgb, 93, 110, 126), 0.2);
+  padding-top: 1rem;
+}
+
+.scanner-note a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.scanner-note a:hover {
+  text-decoration: underline;
+}
+
+/* Manual Input Section */
+.manual-input-section {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background-color: rgba(var(--info-color-rgb, 52, 152, 219), 0.05);
+  border-radius: 8px;
+  border-left: 4px solid var(--info-color);
+}
+
+.manual-input-label {
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: var(--info-color);
+}
+
+.manual-input-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.manual-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(var(--info-color-rgb, 52, 152, 219), 0.3);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.manual-input:focus {
+  outline: none;
+  border-color: var(--info-color);
+  box-shadow: 0 0 0 3px rgba(var(--info-color-rgb, 52, 152, 219), 0.2);
+}
+
+.manual-submit-btn {
+  background-color: var(--info-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.manual-submit-btn:hover {
+  background-color: rgba(var(--info-color-rgb, 52, 152, 219), 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qr-processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
+}
+
+.qr-processing .spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+.qr-processing p {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.qr-error {
+  color: var(--danger-color);
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: rgba(220, 53, 69, 0.1);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.qr-error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  text-align: center;
+}
+
+.qr-error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.qr-error-details {
+  color: var(--secondary-color);
+  margin: 0.5rem 0 1.5rem;
+  font-size: 0.9rem;
+}
+
+.qr-retry-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.qr-retry-button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

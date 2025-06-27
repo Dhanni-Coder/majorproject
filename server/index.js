@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -12,6 +13,11 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from the uploads directory
+const uploadsPath = path.join(__dirname, 'uploads');
+console.log(`Serving static files from: ${uploadsPath}`);
+app.use('/uploads', express.static(uploadsPath));
 
 // Define routes
 app.get('/', (req, res) => {
@@ -26,6 +32,9 @@ const noticeRoutes = require('./routes/notices');
 const branchRoutes = require('./routes/branches');
 const subjectRoutes = require('./routes/subjects');
 const attendanceRoutes = require('./routes/attendance');
+const bookRoutes = require('./routes/books');
+const bookIssueRoutes = require('./routes/bookIssues');
+const adminRoutes = require('./routes/admin');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -35,6 +44,9 @@ app.use('/api/notices', noticeRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/books', bookRoutes);
+app.use('/api/book-issues', bookIssueRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;

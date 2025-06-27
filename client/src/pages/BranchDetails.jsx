@@ -111,7 +111,7 @@ const BranchDetails = () => {
       return;
     }
 
-    if (window.confirm(`Are you sure you want to delete the subject "${subjectName}"?`)) {
+    if (window.confirm(`Are you sure you want to delete the subject "${subjectName}"? This will also delete all attendance records associated with this subject.`)) {
       try {
         setLoading(true);
         setError('');
@@ -119,12 +119,18 @@ const BranchDetails = () => {
         // Set up axios headers
         axios.defaults.headers.common['x-auth-token'] = token;
 
-        await axios.delete(`http://localhost:5000/api/subjects/${subjectId}`);
+        const response = await axios.delete(`http://localhost:5000/api/subjects/${subjectId}`);
+        console.log('Delete subject response:', response.data);
 
         // Remove the deleted subject from the subjects list
         setSubjects(subjects.filter(subject => subject._id !== subjectId));
 
-        setSuccessMessage('Subject deleted successfully!');
+        // Show success message with attendance records deleted info
+        if (response.data.attendanceRecordsDeleted !== undefined) {
+          setSuccessMessage(`Subject deleted successfully! Also deleted ${response.data.attendanceRecordsDeleted} attendance records.`);
+        } else {
+          setSuccessMessage('Subject deleted successfully!');
+        }
 
         // Clear success message after 3 seconds
         setTimeout(() => {
@@ -330,7 +336,7 @@ const BranchDetails = () => {
       </div>
 
       <div className="subjects-container">
-        {loading && subjects.length === 0 ? (
+        {loading ? (
           <div className="loading">Loading subjects...</div>
         ) : filteredSubjects.length > 0 ? (
           Object.keys(groupedSubjects)

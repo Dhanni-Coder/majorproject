@@ -2,6 +2,8 @@ const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const QRCode = require('qrcode');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 // Generate a random string for QR code secret
 const generateQRSecret = () => {
@@ -189,9 +191,24 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ msg: 'User not found' });
     }
 
+    // If the user is a student, delete their attendance records
+    let attendanceRecordsDeleted = 0;
+    if (user.role === 'student') {
+      console.log(`Deleting attendance records for student: ${user._id}`);
+      const Attendance = require('../models/Attendance');
+      const deletedAttendance = await Attendance.deleteMany({ student: user._id });
+      attendanceRecordsDeleted = deletedAttendance.deletedCount;
+      console.log(`Deleted ${attendanceRecordsDeleted} attendance records`);
+    }
+
+    // Delete the user
     await user.deleteOne();
 
-    res.json({ msg: 'User removed' });
+    // Return information about deleted records
+    res.json({
+      msg: 'User removed',
+      attendanceRecordsDeleted: user.role === 'student' ? attendanceRecordsDeleted : undefined
+    });
   } catch (err) {
     console.error(err.message);
 
@@ -454,9 +471,19 @@ exports.deleteStudent = async (req, res) => {
       return res.status(400).json({ msg: 'User is not a student' });
     }
 
+    // Delete the student's attendance records
+    console.log(`Deleting attendance records for student: ${student._id}`);
+    const Attendance = require('../models/Attendance');
+    const deletedAttendance = await Attendance.deleteMany({ student: student._id });
+    console.log(`Deleted ${deletedAttendance.deletedCount} attendance records`);
+
+    // Delete the student
     await student.deleteOne();
 
-    res.json({ msg: 'Student removed successfully' });
+    res.json({
+      msg: 'Student removed successfully',
+      attendanceRecordsDeleted: deletedAttendance.deletedCount
+    });
   } catch (err) {
     console.error('Delete student error:', err.message);
 
@@ -535,7 +562,8 @@ exports.addBranchStudent = async (req, res) => {
         email: user.email,
         role: user.role,
         branch: user.branch,
-        semester: user.semester
+        semester: user.semester,
+        qrCode: user.qrCode // Include QR code in the response
       }
     });
   } catch (err) {
@@ -646,6 +674,162 @@ exports.assignStudentsToBranch = async (req, res) => {
   }
 };
 
+// @route   GET api/users/me
+// @desc    Get current user
+// @access  Private
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error('Error getting current user:', err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+// @route   PUT api/users/update-profile
+// @desc    Update user profile
+// @access  Private
+exports.updateProfile = async (req, res) => {
+  // Check for validation errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { name, email, branch, semester } = req.body;
+    console.log('Update profile request received:', { name, email, branch, semester });
+
+    // Find the user
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      console.error('User not found with ID:', req.user.id);
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    // Only allow admins to change email
+    if (email && email !== user.email) {
+      // Check if user is admin
+      if (user.role !== 'admin') {
+        console.log('Non-admin user attempted to change email:', user.id);
+        return res.status(403).json({ msg: 'Only administrators can change email addresses' });
+      }
+
+      // Check if email is already in use
+      const existingUser = await User.findOne({ email });
+      if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+        return res.status(400).json({ msg: 'Email already in use by another account' });
+      }
+    }
+
+    // Update user fields
+    if (name) user.name = name;
+    // Only update email if user is admin
+    if (email && user.role === 'admin') user.email = email;
+    if (branch !== undefined) user.branch = branch;
+    if (semester !== undefined && user.role === 'student') user.semester = semester;
+
+    console.log('Updating user with data:', {
+      name: user.name,
+      email: user.email,
+      branch: user.branch,
+      semester: user.semester
+    });
+
+    await user.save();
+    console.log('User updated successfully');
+
+    res.json({
+      msg: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        branch: user.branch,
+        semester: user.semester,
+        profilePicture: user.profilePicture
+      }
+    });
+  } catch (err) {
+    console.error('Update profile error:', err.message);
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
+};
+
+// @route   PUT api/users/update-profile-picture
+// @desc    Update user profile picture
+// @access  Private
+exports.updateProfilePicture = async (req, res) => {
+  try {
+    console.log('Update profile picture request received');
+
+    // Check if file was uploaded
+    if (!req.file) {
+      console.log('No file uploaded');
+      return res.status(400).json({ msg: 'No file uploaded' });
+    }
+
+    console.log('File uploaded:', req.file);
+
+    // Find the user
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      console.log('User not found:', req.user.id);
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    console.log('User found:', user.email);
+
+    // Make sure uploads directory exists
+    const uploadsDir = path.join(__dirname, '..', 'uploads', 'profiles');
+    if (!fs.existsSync(uploadsDir)) {
+      console.log('Creating uploads directory:', uploadsDir);
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    // If user already has a profile picture, delete the old one
+    if (user.profilePicture) {
+      try {
+        const oldPicturePath = path.join(__dirname, '..', user.profilePicture.replace(/^\/?uploads/, 'uploads'));
+        console.log('Checking for old profile picture:', oldPicturePath);
+        if (fs.existsSync(oldPicturePath)) {
+          console.log('Deleting old profile picture');
+          fs.unlinkSync(oldPicturePath);
+        }
+      } catch (error) {
+        console.error('Error deleting old profile picture:', error);
+        // Continue even if old picture deletion fails
+      }
+    }
+
+    // Set the new profile picture path
+    user.profilePicture = `/uploads/profiles/${req.file.filename}`;
+    console.log('New profile picture path:', user.profilePicture);
+
+    await user.save();
+    console.log('User saved with new profile picture');
+
+    res.json({
+      msg: 'Profile picture updated successfully',
+      profilePicture: user.profilePicture
+    });
+  } catch (err) {
+    console.error('Update profile picture error:', err);
+    res.status(500).json({
+      msg: 'Server error',
+      error: err.message,
+      stack: err.stack
+    });
+  }
+};
+
 // @route   PUT api/users/update-branch
 // @desc    Update user's branch (for teachers)
 // @access  Private (Teacher only)
@@ -716,3 +900,21 @@ exports.updateBranch = async (req, res) => {
   }
 };
 
+// @route   GET api/users/by-email/:email
+// @desc    Get user by email
+// @access  Private (Admin and Teacher)
+exports.getUserByEmail = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.email })
+      .select('-password -qrCode -qrCodeSecret');
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error('Error fetching user by email:', err.message);
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
+};

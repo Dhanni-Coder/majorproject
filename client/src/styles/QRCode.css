@@ -1,0 +1,355 @@
+/* QR Code Page Styles */
+:root {
+  --qr-primary-color: #4361ee;
+  --qr-primary-dark: #3a0ca3;
+  --qr-primary-light: #e9efff;
+  --qr-secondary-color: #f72585;
+  --qr-secondary-light: #ffd6e9;
+  --qr-accent-color: #4cc9f0;
+  --qr-accent-light: #e3f8ff;
+  --qr-success-color: #2ec4b6;
+  --qr-success-light: #e3f9f7;
+  --qr-warning-color: #ff9f1c;
+  --qr-warning-light: #fff4e6;
+  --qr-danger-color: #e71d36;
+  --qr-danger-light: #ffe3e6;
+  --qr-dark-color: #212529;
+  --qr-light-color: #f8f9fa;
+  --qr-gray-color: #6c757d;
+  --qr-gray-light: #e9ecef;
+  --qr-border-radius: 12px;
+  --qr-border-radius-lg: 16px;
+  --qr-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --qr-hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  --qr-transition: all 0.3s ease;
+}
+
+/* Main Container */
+.qr-code-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  padding: 2rem;
+  background-color: #f5f7ff;
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(67, 97, 238, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(67, 97, 238, 0.03) 0%, transparent 50%);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* QR Code Container */
+.qr-code-container {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: var(--qr-border-radius-lg);
+  box-shadow: var(--qr-card-shadow);
+  padding: 3rem;
+  width: 100%;
+  max-width: 550px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: var(--qr-transition);
+  animation: fadeIn 0.8s ease-out;
+}
+
+.qr-code-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--qr-primary-color), transparent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.qr-code-container:hover::before {
+  opacity: 1;
+}
+
+/* QR Code Header */
+.qr-code-container h1 {
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, var(--qr-primary-color), var(--qr-primary-dark));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 2.5rem;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+  text-shadow: 0 2px 10px rgba(67, 97, 238, 0.1);
+  transition: all 0.3s ease;
+  animation: gradientAnimation 8s ease infinite;
+}
+
+.qr-code-container .lead {
+  color: var(--qr-gray-color);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+/* QR Code Display */
+.qr-code-display {
+  margin: 2.5rem 0;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-code-display img {
+  max-width: 250px;
+  border-radius: 12px;
+  padding: 1rem;
+  background-color: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(67, 97, 238, 0.1);
+  transition: all 0.3s ease;
+  animation: pulse 3s infinite ease-in-out;
+}
+
+.qr-code-display img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(67, 97, 238, 0.15);
+}
+
+.qr-code-display::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 2px dashed rgba(67, 97, 238, 0.2);
+  border-radius: 20px;
+  z-index: -1;
+  animation: rotate 15s linear infinite;
+}
+
+/* QR Code Actions */
+.qr-code-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.qr-code-actions button {
+  background: linear-gradient(135deg, var(--qr-primary-color) 0%, var(--qr-primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-code-actions button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.qr-code-actions button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
+}
+
+.qr-code-actions button:hover::before {
+  left: 100%;
+}
+
+.qr-code-actions button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* QR Code Warning */
+.qr-code-warning {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background-color: var(--qr-warning-light);
+  border-radius: var(--qr-border-radius);
+  text-align: left;
+  border-left: 4px solid var(--qr-warning-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-code-warning p {
+  margin: 0;
+  color: var(--qr-dark-color);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+.qr-code-warning::before {
+  content: '⚠️';
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  opacity: 0.1;
+  z-index: 0;
+}
+
+/* Messages */
+.error-message, .success-message {
+  padding: 1rem;
+  border-radius: var(--qr-border-radius);
+  margin-bottom: 1.5rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.error-message {
+  background-color: var(--qr-danger-light);
+  color: var(--qr-danger-color);
+  border-left: 4px solid var(--qr-danger-color);
+}
+
+.success-message {
+  background-color: var(--qr-success-light);
+  color: var(--qr-success-color);
+  border-left: 4px solid var(--qr-success-color);
+}
+
+.error-message::before {
+  content: '❌';
+}
+
+.success-message::before {
+  content: '✅';
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--qr-gray-color);
+  font-style: italic;
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(67, 97, 238, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid var(--qr-primary-color);
+  animation: spin 1s linear infinite;
+  margin-top: 1rem;
+}
+
+/* No QR Code State */
+.no-qr-code {
+  padding: 2rem;
+  color: var(--qr-danger-color);
+  font-style: italic;
+  background-color: var(--qr-danger-light);
+  border-radius: var(--qr-border-radius);
+  margin: 1rem 0;
+}
+
+/* Icon Animations */
+.icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .qr-code-page {
+    padding: 1.5rem;
+  }
+
+  .qr-code-container {
+    padding: 2rem;
+  }
+
+  .qr-code-container h1 {
+    font-size: 2rem;
+  }
+
+  .qr-code-display img {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .qr-code-container {
+    padding: 1.5rem;
+  }
+
+  .qr-code-container h1 {
+    font-size: 1.75rem;
+  }
+
+  .qr-code-display img {
+    max-width: 180px;
+  }
+
+  .qr-code-actions button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}

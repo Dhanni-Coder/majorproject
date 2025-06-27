@@ -47,10 +47,37 @@
   min-width: 150px;
 }
 
-.subject-select-container {
+.subject-select-container,
+.date-input-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.date-input {
+  min-width: 180px;
+  appearance: none;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* Make the calendar icon clickable */
+.date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+/* Fix for date input in Firefox */
+@-moz-document url-prefix() {
+  .date-input {
+    background-color: transparent;
+  }
 }
 
 .subject-select {
@@ -323,6 +350,14 @@
   background-color: #f8f9fa;
   border-radius: 4px;
   text-align: center;
+}
+
+.attendance-primary-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .attendance-help-text {

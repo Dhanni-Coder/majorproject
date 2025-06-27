@@ -4,8 +4,15 @@ const User = require('../models/User');
 // Middleware to verify JWT token
 const auth = async (req, res, next) => {
   try {
-    // Get token from header
-    const token = req.header('x-auth-token');
+    // Get token from header (support both x-auth-token and Authorization header)
+    let token = req.header('x-auth-token');
+
+    // Check for Authorization header (Bearer token)
+    const authHeader = req.header('Authorization');
+    if (!token && authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    }
+
     console.log('Auth middleware - token received:', token ? 'Yes' : 'No');
 
     // Check if no token
@@ -62,4 +69,16 @@ const teacherAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { auth, adminAuth, teacherAuth };
+// Middleware to check if user is student
+const studentAuth = async (req, res, next) => {
+  try {
+    if (req.user.role !== 'student') {
+      return res.status(403).json({ msg: 'Access denied. Student privileges required' });
+    }
+    next();
+  } catch (err) {
+    res.status(500).json({ msg: 'Server Error' });
+  }
+};
+
+module.exports = { auth, adminAuth, teacherAuth, studentAuth };

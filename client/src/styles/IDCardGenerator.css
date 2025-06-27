@@ -1,0 +1,1351 @@
+/* ID Card Generator Styles - Modern Design */
+:root {
+  /* Modern Color Palette */
+  --card-primary: #4361ee;
+  --card-secondary: #3a0ca3;
+  --card-accent: #4cc9f0;
+  --card-light: #f8f9fa;
+  --card-dark: #212529;
+  --card-success: #06d6a0;
+  --card-warning: #ffd166;
+  --card-danger: #ef476f;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #4361ee, #3a0ca3);
+  --gradient-accent: linear-gradient(135deg, #4cc9f0, #4361ee);
+  --gradient-light: linear-gradient(135deg, #ffffff, #f8f9fa);
+
+  /* Design Elements */
+  --card-border-radius: 16px;
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --card-hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  --card-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  /* Glass Effect */
+  --glass-background: rgba(255, 255, 255, 0.25);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --glass-backdrop-filter: blur(8px);
+}
+
+.id-card-page {
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.id-card-page::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(76, 201, 240, 0.1) 0%, rgba(67, 97, 238, 0.05) 50%, transparent 70%);
+  z-index: 0;
+  animation: rotate 60s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.id-card-container {
+  background-color: white;
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 2.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  transition: var(--card-transition);
+  position: relative;
+  z-index: 1;
+  border: var(--glass-border);
+  backdrop-filter: var(--glass-backdrop-filter);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.id-card-container h1 {
+  color: var(--card-primary);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 1rem;
+  position: relative;
+}
+
+.id-card-container h1::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100px;
+  height: 3px;
+  background: var(--gradient-accent);
+  border-radius: 10px;
+}
+
+.id-card-container h1 .icon {
+  color: var(--card-accent);
+  font-size: 2.2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.id-card-instructions {
+  margin-bottom: 2rem;
+  color: #495057;
+  font-size: 1.1rem;
+  background: var(--glass-background);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--card-accent);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-backdrop-filter);
+}
+
+/* Form Styles - Modern Design */
+.id-card-form-container {
+  margin-top: 2rem;
+  position: relative;
+}
+
+.form-decoration-element {
+  position: absolute;
+  top: -15px;
+  right: 30px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(76, 201, 240, 0.1) 0%, rgba(67, 97, 238, 0.05) 50%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  animation: float 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.form-decoration-element::before {
+  content: '';
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(76, 201, 240, 0.08) 0%, rgba(67, 97, 238, 0.03) 50%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(5deg);
+  }
+}
+
+.id-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  position: relative;
+  transition: var(--card-transition);
+}
+
+.form-group:hover {
+  transform: translateY(-2px);
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--card-primary);
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.form-group label .icon {
+  color: var(--card-accent);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: var(--card-transition);
+  background-color: rgba(248, 249, 250, 0.8);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  background-color: rgba(248, 249, 250, 0.95);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--card-accent);
+  box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.15);
+  outline: none;
+  background-color: white;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #adb5bd;
+  font-size: 0.95rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.form-actions button {
+  padding: 0.9rem 2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 12px;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+  transition: var(--card-transition);
+  position: relative;
+  overflow: hidden;
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+}
+
+.form-actions button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+}
+
+.form-actions button:active {
+  transform: translateY(-1px);
+}
+
+.form-actions button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+}
+
+.form-actions button:hover::after {
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Preview Container - Modern Design */
+.id-card-preview-container {
+  margin-top: 2rem;
+  position: relative;
+}
+
+.preview-decoration-element {
+  position: absolute;
+  top: -30px;
+  left: 10%;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(76, 201, 240, 0.12) 0%, rgba(67, 97, 238, 0.06) 50%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  animation: float 10s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.preview-decoration-element::before {
+  content: '';
+  position: absolute;
+  bottom: 30px;
+  right: -100px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(76, 201, 240, 0.08) 0%, rgba(67, 97, 238, 0.04) 50%, transparent 70%);
+  border-radius: 50%;
+  animation: float 7s ease-in-out infinite alternate-reverse;
+}
+
+.id-card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.id-card-actions button {
+  padding: 0.9rem 1.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 12px;
+  transition: var(--card-transition);
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.id-card-actions .btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+}
+
+.id-card-actions .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+}
+
+.id-card-actions .btn-primary:active {
+  transform: translateY(-1px);
+}
+
+.id-card-actions .btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+}
+
+.id-card-actions .btn-primary:hover::after {
+  animation: shimmer 1.5s infinite;
+}
+
+.id-card-actions .btn-secondary {
+  background: var(--glass-background);
+  color: var(--card-dark);
+  border: var(--glass-border);
+  backdrop-filter: var(--glass-backdrop-filter);
+  box-shadow: var(--glass-shadow);
+}
+
+.id-card-actions .btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.id-card-actions .btn-secondary:active {
+  transform: translateY(-1px);
+}
+
+.id-card-preview {
+  display: flex;
+  justify-content: center;
+  padding: 3.5rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: var(--card-border-radius);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.id-card-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="1" fill="%234361ee" opacity="0.2"/></svg>') repeat;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ID Card Styles - Modern Design */
+.id-cards-wrapper {
+  display: flex;
+  gap: 3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  perspective: 1000px;
+}
+
+.id-card {
+  width: 350px;
+  height: 550px;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  color: var(--card-dark);
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-style: preserve-3d;
+}
+
+.id-card-front, .id-card-back {
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  backface-visibility: hidden;
+}
+
+.id-card-front:hover, .id-card-back:hover {
+  transform: translateY(-15px) rotateY(8deg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Front Side - Redesigned Modern Design */
+.id-card-header {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 2.25rem 1rem;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 5px solid var(--card-accent);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px; /* Ensure minimum height for the header */
+}
+
+.id-card-header::before,
+.id-card-header::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+.id-card-header::before {
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 70%);
+}
+
+.id-card-header::after {
+  bottom: -40px;
+  left: -40px;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.03) 70%);
+}
+
+.college-name-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.college-name-container h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.5px;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.watermark-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.id-card-watermark {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  opacity: 0.57;
+  filter: blur(1px);
+  transform: scale(1.2);
+}
+
+
+
+.front-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem;
+  flex: 1;
+  background: var(--gradient-light);
+  position: relative;
+}
+
+.front-body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M0,0 L100,0 L100,100 L0,100 Z" fill="none" stroke="%234cc9f0" stroke-width="0.5" stroke-opacity="0.2"/></svg>') repeat;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.front-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  z-index: 1;
+}
+
+.student-photo-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.photo-border-decoration {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 2px solid var(--card-accent);
+  border-radius: 18px;
+  z-index: -1;
+  opacity: 0.7;
+}
+
+.photo-border-decoration::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 1px dashed rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+}
+
+.id-card-photo-front, .id-card-photo-placeholder-front {
+  width: 110px;
+  height: 130px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border: 3px solid white;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.id-card-front:hover .id-card-photo-front,
+.id-card-front:hover .id-card-photo-placeholder-front {
+  transform: scale(1.03);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.id-card-photo-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.id-card-photo-placeholder-front {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+}
+
+.id-card-photo-placeholder-front .placeholder-icon {
+  font-size: 3.5rem;
+  color: #829ab1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.front-details {
+  width: 100%;
+  position: relative;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.front-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--card-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(to right, var(--card-primary), var(--card-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  display: inline-block;
+}
+
+.front-name::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 2px;
+  background: var(--gradient-accent);
+  border-radius: 10px;
+}
+
+.student-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.front-branch, .front-roll, .front-semester, .front-academic-year {
+  font-size: 0.85rem;
+  color: #495057;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border-left: 3px solid var(--card-accent);
+}
+
+.front-qr {
+  margin-top: 0.75rem;
+  z-index: 1;
+  position: relative;
+  background: white;
+  padding: 0.3rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.id-card-qr-image {
+  width: 90px;
+  height: 90px;
+  background-color: white;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+  object-fit: contain;
+  display: block;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.id-card-front:hover .id-card-qr-image {
+  transform: scale(1.05);
+}
+
+.id-card-qr-placeholder {
+  width: 90px;
+  height: 90px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.id-card-front:hover .id-card-qr-placeholder {
+  transform: scale(1.05);
+}
+
+.id-card-qr-placeholder .placeholder-icon {
+  font-size: 3rem;
+  color: #829ab1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.id-card-footer {
+  background: var(--gradient-primary);
+  padding: 1rem;
+  color: white;
+  position: relative;
+  border-top: 3px solid var(--card-accent);
+}
+
+.front-footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.id-card-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="1" fill="%23ffffff"/></svg>') repeat;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.id-card-validity {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.25);
+  padding: 0.35rem 1.25rem;
+  border-radius: 50px;
+  display: inline-block;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+}
+
+/* Back Side - Redesigned Modern Design */
+.id-card-back {
+  background-color: white;
+}
+
+.back-header {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1.75rem 1rem;
+  text-align: center;
+  border-bottom: 5px solid var(--card-accent);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px; /* Ensure minimum height for the header */
+}
+
+.back-header::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 70%);
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+.back-body {
+  padding: 1.5rem;
+  flex: 1;
+  background: var(--gradient-light);
+  position: relative;
+}
+
+.back-body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M0,0 L100,0 L100,100 L0,100 Z" fill="none" stroke="%234cc9f0" stroke-width="0.5" stroke-opacity="0.2"/></svg>') repeat;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.id-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  padding: 0.75rem;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0.75rem;
+}
+
+.id-card-detail {
+  display: flex;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 0.5rem;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.id-card-detail:hover {
+  transform: translateX(5px);
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.detail-label {
+  font-weight: 600;
+  width: 130px;
+  color: var(--card-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.3px;
+}
+
+.detail-label .icon {
+  color: var(--card-accent);
+  font-size: 0.95rem;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
+}
+
+.detail-value {
+  flex: 1;
+  color: #495057;
+  font-weight: 500;
+  padding-left: 0.5rem;
+  border-left: 2px solid rgba(76, 201, 240, 0.2);
+}
+
+.address-value {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.back-footer {
+  background: var(--gradient-primary);
+  padding: 1.25rem;
+  color: white;
+  position: relative;
+  border-top: 3px solid var(--card-accent);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.back-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="1" fill="%23ffffff"/></svg>') repeat;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.back-footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
+}
+
+.id-card-signature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.signature-line {
+  width: 140px;
+  height: 2px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+  margin-bottom: 0.5rem;
+  border-radius: 2px;
+}
+
+.id-card-signature p {
+  font-size: 0.8rem;
+  margin: 0;
+  color: rgba(108, 83, 83, 0.95);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.back-note {
+  text-align: right;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  backdrop-filter: blur(5px);
+  padding: 0.5rem;
+}
+
+.back-note p {
+  letter-spacing: 0.3px;
+  text-align: left;
+  margin: 0.2rem 0;
+}
+
+/* Back QR Code Styles */
+.back-qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+
+
+.back-qr {
+  background: white;
+  padding: 0.3rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-qr-image {
+  width: 90px;
+  height: 90px;
+}
+
+/* Responsive Styles - Modern Design */
+@media (max-width: 992px) {
+  .id-cards-wrapper {
+    gap: 2.5rem;
+  }
+
+  .id-card-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .id-card-container h1 .icon {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .id-card-page::before {
+    opacity: 0.7;
+  }
+
+  .id-card-container {
+    padding: 1.75rem;
+    margin: 0 1rem;
+  }
+
+  .id-cards-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 3.5rem;
+  }
+
+  .id-card {
+    width: 330px;
+    height: 520px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .college-name-container h2 {
+    font-size: 1.2rem;
+  }
+
+  .id-card-watermark {
+    width: 180px;
+    height: 180px;
+  }
+
+
+  .id-card-photo-front, .id-card-photo-placeholder-front {
+    width: 120px;
+    height: 140px;
+  }
+
+  .front-name {
+    font-size: 1.4rem;
+  }
+
+  .front-branch, .front-roll, .front-semester, .front-academic-year {
+    font-size: 0.9rem;
+  }
+
+  .id-card-qr-image, .id-card-qr-placeholder {
+    width: 90px;
+    height: 90px;
+  }
+
+  .form-actions button,
+  .id-card-actions button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .detail-label {
+    width: 120px;
+    font-size: 0.85rem;
+  }
+
+  .detail-value {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .id-card-page {
+    padding: 1.5rem 0;
+  }
+
+  .id-card-container {
+    padding: 1.25rem;
+    margin: 0 0.75rem;
+    border-radius: 12px;
+  }
+
+  .id-card-container h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .id-card-container h1 .icon {
+    font-size: 1.7rem;
+  }
+
+  .id-card-instructions {
+    font-size: 0.95rem;
+    padding: 1rem;
+  }
+
+  .id-card-preview {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .id-card {
+    width: 290px;
+    height: 460px;
+    border-radius: 16px;
+  }
+
+  .id-card-header {
+    padding: 1rem;
+  }
+
+  .college-name-container h2 {
+    font-size: 1.1rem;
+  }
+
+  .college-name-container p {
+    font-size: 0.8rem;
+  }
+
+  .id-card-watermark {
+    width: 150px;
+    height: 150px;
+  }
+
+  .id-card-title-banner {
+    margin: 0.5rem 0 1rem;
+    padding: 0.4rem;
+  }
+
+  .id-card-title-banner p,
+  .back-title-banner h3 {
+    font-size: 0.85rem;
+  }
+
+  .front-body, .back-body {
+    padding: 1rem;
+  }
+
+  .student-photo-container {
+    margin-bottom: 1.25rem;
+  }
+
+  .id-card-photo-front, .id-card-photo-placeholder-front {
+    width: 110px;
+    height: 130px;
+    border-radius: 12px;
+  }
+
+  .front-details {
+    padding: 0.4rem;
+  }
+
+  .front-name {
+    font-size: 1.2rem;
+  }
+
+  .front-name::after {
+    width: 60px;
+    height: 1.5px;
+  }
+
+  .student-info-container {
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+  }
+
+  .front-branch, .front-roll, .front-semester, .front-academic-year {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .front-qr {
+    margin-top: 1rem;
+    padding: 0.4rem;
+    border-radius: 10px;
+  }
+
+  .id-card-qr-image, .id-card-qr-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+  }
+
+  .id-card-details {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .id-card-detail {
+    font-size: 0.8rem;
+    padding: 0.4rem;
+  }
+
+  .detail-label {
+    width: 100px;
+    font-size: 0.8rem;
+    gap: 0.4rem;
+  }
+
+  .detail-value {
+    font-size: 0.8rem;
+    padding-left: 0.4rem;
+  }
+
+  .address-value {
+    font-size: 0.75rem;
+  }
+
+
+
+  .back-qr-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .form-actions button,
+  .id-card-actions button {
+    padding: 0.7rem 1.25rem;
+    font-size: 0.95rem;
+    border-radius: 10px;
+  }
+
+  .id-card-actions {
+    margin-bottom: 1.5rem;
+  }
+
+  .id-card-footer, .back-footer {
+    padding: 0.9rem;
+  }
+
+  .id-card-validity {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.9rem;
+  }
+
+  .back-title-banner {
+    margin: 0.5rem 0 1rem;
+    padding: 0.4rem;
+  }
+
+  .signature-line {
+    width: 110px;
+  }
+
+  .id-card-signature p {
+    font-size: 0.75rem;
+  }
+
+  .back-note {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    margin-top: 0;
+  }
+
+  .back-note p {
+    font-size: 0.75rem;
+    margin: 0.15rem 0;
+  }
+}
+
+/* Print Styles - Redesigned Modern Design */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .id-card-preview, .id-card-preview * {
+    visibility: visible;
+  }
+
+  .id-card-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .id-cards-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    page-break-inside: avoid;
+    transform: scale(0.9);
+  }
+
+  .id-card {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+    background-color: white !important;
+    height: 550px !important;
+    width: 350px !important;
+  }
+
+  .id-card-front:hover, .id-card-back:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .id-card-front:hover .id-card-photo-front,
+  .id-card-front:hover .id-card-photo-placeholder-front,
+  .id-card-front:hover .id-card-qr-image,
+  .id-card-front:hover .id-card-qr-placeholder {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .id-card-detail:hover {
+    transform: none !important;
+  }
+
+  .id-card-header, .back-header, .id-card-footer, .back-footer {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .id-card-watermark {
+    opacity: 0.05 !important;
+  }
+
+  .front-details, .id-card-details, .front-branch,
+  .front-roll, .front-semester, .back-note {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .id-card-title-banner, .back-title-banner {
+    background-color: rgba(76, 201, 240, 0.15) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .photo-border-decoration {
+    border-color: var(--card-accent) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

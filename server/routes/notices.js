@@ -28,6 +28,11 @@ router.post(
 // @access  Private
 router.get('/', auth, noticeController.getNotices);
 
+// @route   GET api/notices/stats
+// @desc    Get notice statistics for a teacher
+// @access  Private
+router.get('/stats', auth, noticeController.getNoticeStats);
+
 // @route   GET api/notices/:id
 // @desc    Get a notice by ID
 // @access  Private
@@ -56,3 +61,6 @@ router.put(
 router.delete('/:id', auth, noticeController.deleteNotice);
 
 module.exports = router;
+
+
+

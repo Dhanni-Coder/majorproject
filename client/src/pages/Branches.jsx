@@ -1,8 +1,13 @@
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import AuthContext from '../context/AuthContext';
-import { FaPlus, FaEdit, FaTrash, FaBook, FaGraduationCap } from 'react-icons/fa';
+import { AuthContext } from '../context/AuthContext';
+import { 
+  FaUniversity, FaPlus, FaCode, FaInfoCircle, FaCheckCircle, 
+  FaGraduationCap, FaTrash, FaSearch, FaEdit, FaEye, 
+  FaSpinner, FaExclamationTriangle
+} from 'react-icons/fa';
+import '../styles/Branches.css';
 
 const Branches = () => {
   const { user, token } = useContext(AuthContext);
@@ -10,60 +15,45 @@ const Branches = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     code: '',
     description: ''
   });
   const [successMessage, setSuccessMessage] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentBranchId, setCurrentBranchId] = useState(null);
 
-  // Predefined branches
-  const predefinedBranches = [
-    { name: 'Computer Science Engineering', code: 'CSE' },
-    { name: 'Information Technology', code: 'IT' },
-    { name: 'Mechanical Engineering', code: 'ME' },
-    { name: 'Mechanical Engineering Auto', code: 'MEA' },
-    { name: 'Civil Engineering', code: 'CE' },
-    { name: 'Electronic Engineering', code: 'EE' },
-    { name: 'Pharmacy', code: 'PHARM' }
-  ];
+  // Permission checks
+  const canCreate = user && ['admin', 'teacher'].includes(user.role);
+  const canEdit = user && ['admin', 'teacher'].includes(user.role);
+  const canDelete = user && user.role === 'admin';
 
   useEffect(() => {
-    const fetchBranches = async () => {
-      if (!token) return;
-      
-      try {
-        setLoading(true);
-        setError('');
-        
-        // Set up axios headers
-        axios.defaults.headers.common['x-auth-token'] = token;
-        
-        const res = await axios.get('http://localhost:5000/api/branches');
-        setBranches(res.data);
-        
-        setError('');
-      } catch (err) {
-        console.error('Error fetching branches:', err);
-        setError('Failed to load branches: ' + (err.response?.data?.msg || err.message));
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBranches();
   }, [token]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const fetchBranches = async () => {
+    if (!token) return;
+
+    try {
+      setLoading(true);
+      setError('');
+      
+      axios.defaults.headers.common['x-auth-token'] = token;
+      const res = await axios.get('http://localhost:5000/api/branches');
+      setBranches(res.data);
+    } catch (err) {
+      console.error('Error fetching branches:', err);
+      setError('Failed to load branches. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSelectPredefined = (branch) => {
-    setFormData({
-      name: branch.name,
-      code: branch.code,
-      description: `${branch.name} department`
-    });
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -73,203 +63,234 @@ const Branches = () => {
       setError('Authentication required');
       return;
     }
-    
+
     try {
       setLoading(true);
       setError('');
-      setSuccessMessage('');
       
-      // Set up axios headers
       axios.defaults.headers.common['x-auth-token'] = token;
       
-      const res = await axios.post('http://localhost:5000/api/branches', formData);
-      
-      // Add the new branch to the branches list
-      setBranches([...branches, res.data.branch]);
+      let res;
+      if (isEditing) {
+        res = await axios.put(`http://localhost:5000/api/branches/${currentBranchId}`, formData);
+        setBranches(branches.map(branch => 
+          branch._id === currentBranchId ? res.data.branch : branch
+        ));
+        setSuccessMessage('Branch updated successfully!');
+      } else {
+        res = await axios.post('http://localhost:5000/api/branches', formData);
+        setBranches([...branches, res.data.branch]);
+        setSuccessMessage('Branch created successfully!');
+      }
       
       // Reset form
-      setFormData({
-        name: '',
-        code: '',
-        description: ''
-      });
-      
+      setFormData({ name: '', code: '', description: '' });
       setShowForm(false);
-      setSuccessMessage('Branch created successfully!');
+      setIsEditing(false);
+      setCurrentBranchId(null);
       
       // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      console.error('Error creating branch:', err);
-      setError(err.response?.data?.msg || 'Error creating branch: ' + err.message);
+      console.error('Error saving branch:', err);
+      setError(err.response?.data?.msg || 'Error saving branch. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleEdit = (branch) => {
+    setFormData({
+      name: branch.name,
+      code: branch.code,
+      description: branch.description || ''
+    });
+    setIsEditing(true);
+    setCurrentBranchId(branch._id);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleDelete = async (id, name) => {
-    if (!token) {
-      setError('Authentication required');
-      return;
-    }
+    if (!canDelete) return;
     
-    if (window.confirm(`Are you sure you want to delete the branch "${name}"? This will also delete all subjects in this branch.`)) {
+    if (window.confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
       try {
         setLoading(true);
-        setError('');
         
-        // Set up axios headers
         axios.defaults.headers.common['x-auth-token'] = token;
-        
         await axios.delete(`http://localhost:5000/api/branches/${id}`);
         
-        // Remove the deleted branch from the branches list
         setBranches(branches.filter(branch => branch._id !== id));
-        
         setSuccessMessage('Branch deleted successfully!');
         
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+        setTimeout(() => setSuccessMessage(''), 3000);
       } catch (err) {
         console.error('Error deleting branch:', err);
-        setError(err.response?.data?.msg || 'Error deleting branch: ' + err.message);
+        setError('Failed to delete branch. Please try again.');
       } finally {
         setLoading(false);
       }
     }
   };
 
-  // Function to check if user can add/edit/delete branches
-  const canManageBranches = () => {
-    return user && (user.role === 'admin' || user.role === 'teacher');
-  };
-
-  // Function to check if user can delete a branch (admin only)
-  const canDeleteBranch = () => {
-    return user && user.role === 'admin';
-  };
+  // Filter branches based on search term
+  const filteredBranches = branches.filter(branch => 
+    branch.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    branch.code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="branches-page">
-      <div className="page-header">
-        <h1>Academic Branches</h1>
-        {canManageBranches() && (
+      {/* Header Section */}
+      <div className="branches-header">
+        <div className="header-content">
+          <h1><FaUniversity /> Academic Branches</h1>
+          <p>Manage your institution's academic departments and specializations</p>
+        </div>
+      </div>
+
+      {/* Notification Messages */}
+      {successMessage && (
+        <div className="success-message">
+          <FaCheckCircle /> {successMessage}
+        </div>
+      )}
+      
+      {error && (
+        <div className="error-message">
+          <FaExclamationTriangle /> {error}
+        </div>
+      )}
+
+      {/* Search and Actions Bar */}
+      <div className="action-bar">
+        <div className="search-container">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search branches..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        
+        {canCreate && (
           <button 
-            className="btn btn-primary"
-            onClick={() => setShowForm(!showForm)}
+            className="btn btn-primary" 
+            onClick={() => {
+              setFormData({ name: '', code: '', description: '' });
+              setIsEditing(false);
+              setCurrentBranchId(null);
+              setShowForm(!showForm);
+            }}
           >
             {showForm ? 'Cancel' : <><FaPlus /> Add Branch</>}
           </button>
         )}
       </div>
-      
-      {error && <div className="error-message">{error}</div>}
-      {successMessage && <div className="success-message">{successMessage}</div>}
-      
+
+      {/* Branch Form */}
       {showForm && (
         <div className="branch-form">
-          <h2>Add New Branch</h2>
-          
-          <div className="predefined-branches">
-            <h3>Quick Add:</h3>
-            <div className="predefined-buttons">
-              {predefinedBranches.map((branch, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className="btn btn-outline btn-sm"
-                  onClick={() => handleSelectPredefined(branch)}
-                >
-                  {branch.name}
-                </button>
-              ))}
-            </div>
-          </div>
+          <h2>{isEditing ? 'Edit Branch' : 'Add New Branch'}</h2>
           
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="name">Branch Name</label>
+              <label htmlFor="name"><FaGraduationCap /> Branch Name</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
-                onChange={handleChange}
-                placeholder="e.g. Computer Science Engineering"
+                onChange={handleInputChange}
+                placeholder="e.g., Computer Science Engineering"
                 required
               />
             </div>
             
             <div className="form-group">
-              <label htmlFor="code">Branch Code</label>
+              <label htmlFor="code"><FaCode /> Branch Code</label>
               <input
                 type="text"
                 id="code"
                 name="code"
                 value={formData.code}
-                onChange={handleChange}
-                placeholder="e.g. CSE"
+                onChange={handleInputChange}
+                placeholder="e.g., CSE"
                 required
               />
-              <small className="form-text">
-                A short code for the branch (e.g. CSE, IT, ME)
-              </small>
+              <small>A short unique identifier for this branch</small>
             </div>
             
             <div className="form-group">
-              <label htmlFor="description">Description (Optional)</label>
+              <label htmlFor="description"><FaInfoCircle /> Description</label>
               <textarea
                 id="description"
                 name="description"
                 value={formData.description}
-                onChange={handleChange}
-                placeholder="Enter branch description"
+                onChange={handleInputChange}
+                placeholder="Brief description of this academic branch"
                 rows="3"
               ></textarea>
             </div>
             
-            <button 
-              type="submit" 
-              className="btn btn-primary"
-              disabled={loading}
-            >
-              {loading ? 'Creating...' : 'Create Branch'}
-            </button>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? <><FaSpinner className="icon-spin" /> Processing...</> : 
+                  isEditing ? <><FaEdit /> Update Branch</> : <><FaPlus /> Create Branch</>}
+              </button>
+              
+              <button 
+                type="button" 
+                className="btn btn-secondary"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       )}
-      
+
+      {/* Branches Grid */}
       <div className="branches-container">
         {loading && branches.length === 0 ? (
-          <div className="loading">Loading branches...</div>
-        ) : branches.length > 0 ? (
+          <div className="loading-container">
+            <FaSpinner className="icon-spin" />
+            <p>Loading branches...</p>
+          </div>
+        ) : filteredBranches.length > 0 ? (
           <div className="branches-grid">
-            {branches.map(branch => (
+            {filteredBranches.map(branch => (
               <div key={branch._id} className="branch-card">
-                <div className="branch-header">
-                  <h3 className="branch-name">
-                    <FaGraduationCap className="branch-icon" />
-                    {branch.name}
-                  </h3>
+                <div className="branch-card-header">
+                  <h3>{branch.name}</h3>
                   <span className="branch-code">{branch.code}</span>
                 </div>
                 
-                {branch.description && (
-                  <p className="branch-description">{branch.description}</p>
-                )}
+                <div className="branch-card-body">
+                  <p>{branch.description || `Department of ${branch.name}`}</p>
+                </div>
                 
-                <div className="branch-actions">
-                  <Link to={`/branches/${branch._id}`} className="btn btn-primary">
-                    <FaBook /> View Subjects
+                <div className="branch-card-footer">
+                  <Link to={`/branches/${branch._id}`} className="btn btn-outline">
+                    <FaEye /> View Details
                   </Link>
                   
-                  {canDeleteBranch() && (
+                  {canEdit && (
                     <button 
-                      className="btn btn-danger"
+                      className="btn btn-outline-secondary"
+                      onClick={() => handleEdit(branch)}
+                    >
+                      <FaEdit /> Edit
+                    </button>
+                  )}
+                  
+                  {canDelete && (
+                    <button 
+                      className="btn btn-outline-danger"
                       onClick={() => handleDelete(branch._id, branch.name)}
                     >
                       <FaTrash /> Delete
@@ -280,15 +301,13 @@ const Branches = () => {
             ))}
           </div>
         ) : (
-          <div className="no-branches">
-            <FaGraduationCap className="no-branches-icon" />
-            <p>No branches found.</p>
-            {canManageBranches() && (
-              <button 
-                className="btn btn-primary"
-                onClick={() => setShowForm(true)}
-              >
-                Add First Branch
+          <div className="empty-state">
+            <FaGraduationCap className="empty-icon" />
+            <h3>No branches found</h3>
+            <p>{searchTerm ? 'Try adjusting your search term' : 'Get started by adding your first academic branch'}</p>
+            {canCreate && !searchTerm && (
+              <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+                <FaPlus /> Add First Branch
               </button>
             )}
           </div>

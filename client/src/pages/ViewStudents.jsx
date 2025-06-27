@@ -2,7 +2,30 @@ import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
-import { FaUser, FaEnvelope, FaQrcode, FaSearch, FaDownload, FaEdit, FaTrash, FaPlus, FaGraduationCap, FaUserPlus, FaCalendarAlt } from 'react-icons/fa';
+import {
+  FaUser,
+  FaEnvelope,
+  FaQrcode,
+  FaSearch,
+  FaDownload,
+  FaEdit,
+  FaTrash,
+  FaPlus,
+  FaGraduationCap,
+  FaUserPlus,
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaBookReader,
+  FaIdCard,
+  FaSchool,
+  FaUserGraduate,
+  FaUserEdit,
+  FaInfoCircle,
+  FaChalkboardTeacher,
+  FaBook,
+  FaSpinner
+} from 'react-icons/fa';
 import '../styles/ViewStudents.css';
 
 const ViewStudents = () => {
@@ -24,8 +47,18 @@ const ViewStudents = () => {
     name: '',
     email: '',
     password: '',
-    semester: 1
+    semester: 1,
+    branch: user?.role === 'admin' ? 'CSE' : ''
   });
+  const [branches, setBranches] = useState([
+    { code: 'CSE', name: 'Computer Science Engineering' },
+    { code: 'IT', name: 'Information Technology' },
+    { code: 'ME', name: 'Mechanical Engineering' },
+    { code: 'MEA', name: 'Mechanical Automobile Engineering' },
+    { code: 'CE', name: 'Civil Engineering' },
+    { code: 'EE', name: 'Electrical Engineering' },
+    { code: 'PHARM', name: 'Pharmacy' }
+  ]);
   const [assignFormData, setAssignFormData] = useState({
     semester: 1
   });
@@ -135,7 +168,8 @@ const ViewStudents = () => {
       name: '',
       email: '',
       password: '',
-      semester: 1
+      semester: 1,
+      branch: user?.role === 'admin' ? 'CSE' : ''
     });
     setShowAddModal(true);
   };
@@ -187,7 +221,8 @@ const ViewStudents = () => {
       name: student.name,
       email: student.email,
       password: '',
-      semester: student.semester || 1
+      semester: student.semester || 1,
+      branch: student.branch || (user.role === 'admin' ? 'CSE' : '')
     });
     setShowEditModal(true);
   };
@@ -206,7 +241,14 @@ const ViewStudents = () => {
       // Set up axios headers
       axios.defaults.headers.common['x-auth-token'] = token;
 
-      const res = await axios.post('http://localhost:5000/api/users/add-branch-student', formData);
+      let endpoint;
+      if (user.role === 'teacher') {
+        endpoint = 'http://localhost:5000/api/users/add-branch-student';
+      } else if (user.role === 'admin') {
+        endpoint = 'http://localhost:5000/api/users/add-student';
+      }
+
+      const res = await axios.post(endpoint, formData);
 
       // Add the new student to the list
       setStudents([...students, res.data.user]);
@@ -236,15 +278,34 @@ const ViewStudents = () => {
       // Set up axios headers
       axios.defaults.headers.common['x-auth-token'] = token;
 
-      const res = await axios.put(`http://localhost:5000/api/users/update-student/${selectedStudent._id}`, {
-        name: formData.name,
-        email: formData.email,
-        semester: formData.semester
-      });
+      let endpoint;
+      let updateData;
+
+      if (user.role === 'teacher') {
+        endpoint = `http://localhost:5000/api/users/update-student/${selectedStudent._id}`;
+        updateData = {
+          name: formData.name,
+          email: formData.email,
+          semester: formData.semester
+        };
+      } else if (user.role === 'admin') {
+        endpoint = `http://localhost:5000/api/users/${selectedStudent._id}`;
+        updateData = {
+          name: formData.name,
+          email: formData.email,
+          semester: formData.semester,
+          branch: formData.branch
+        };
+      }
+
+      const res = await axios.put(endpoint, updateData);
+
+      // Get the updated student data from the response
+      const updatedStudent = res.data.student || res.data.user || res.data;
 
       // Update the student in the list
       const updatedStudents = students.map(student =>
-        student._id === selectedStudent._id ? res.data.student : student
+        student._id === selectedStudent._id ? updatedStudent : student
       );
 
       setStudents(updatedStudents);
@@ -264,7 +325,7 @@ const ViewStudents = () => {
   const handleDelete = async (studentId) => {
     if (!token) return;
 
-    if (window.confirm('Are you sure you want to delete this student?')) {
+    if (window.confirm('Are you sure you want to delete this student? This will also delete all attendance records associated with this student.')) {
       try {
         setLoading(true);
         setError('');
@@ -273,14 +334,27 @@ const ViewStudents = () => {
         // Set up axios headers
         axios.defaults.headers.common['x-auth-token'] = token;
 
-        await axios.delete(`http://localhost:5000/api/users/delete-student/${studentId}`);
+        let endpoint;
+        if (user.role === 'teacher') {
+          endpoint = `http://localhost:5000/api/users/delete-student/${studentId}`;
+        } else if (user.role === 'admin') {
+          endpoint = `http://localhost:5000/api/users/${studentId}`;
+        }
+
+        const response = await axios.delete(endpoint);
+        console.log('Delete student response:', response.data);
 
         // Remove the student from the list
         const updatedStudents = students.filter(student => student._id !== studentId);
         setStudents(updatedStudents);
         setFilteredStudents(updatedStudents);
 
-        setSuccessMessage('Student deleted successfully!');
+        // Show success message with attendance records deleted info
+        if (response.data.attendanceRecordsDeleted !== undefined) {
+          setSuccessMessage(`Student deleted successfully! Also deleted ${response.data.attendanceRecordsDeleted} attendance records.`);
+        } else {
+          setSuccessMessage('Student deleted successfully!');
+        }
       } catch (err) {
         console.error('Error deleting student:', err);
         setError('Failed to delete student: ' + (err.response?.data?.msg || err.message));
@@ -343,13 +417,8 @@ const ViewStudents = () => {
     <div className="view-students-page">
       <div className="page-header">
         <h1>
-          {user.role === 'teacher' ? (
-            <>
-              <FaGraduationCap className="icon" /> {user.branch} Students
-            </>
-          ) : (
-            'View All Students'
-          )}
+          <FaGraduationCap className="icon" />
+          {user.role === 'teacher' ? `${user.branch || 'Unassigned'} Students` : 'All Students'}
         </h1>
 
         {user.role === 'teacher' && (
@@ -362,10 +431,26 @@ const ViewStudents = () => {
             </button>
           </div>
         )}
+
+        {user.role === 'admin' && (
+          <div className="action-buttons">
+            <button className="btn btn-secondary" onClick={openAddModal}>
+              <FaPlus className="icon" /> Add New Student
+            </button>
+          </div>
+        )}
       </div>
 
-      {error && <div className="error-message">{error}</div>}
-      {successMessage && <div className="success-message">{successMessage}</div>}
+      {error && (
+        <div className="error-message">
+          <FaExclamationCircle /> {error}
+        </div>
+      )}
+      {successMessage && (
+        <div className="success-message">
+          <FaCheckCircle /> {successMessage}
+        </div>
+      )}
 
       <div className="search-container">
         <div className="search-box">
@@ -388,7 +473,9 @@ const ViewStudents = () => {
               .sort(([semA], [semB]) => Number(semA) - Number(semB))
               .map(([semester, semesterStudents]) => (
                 <div key={semester} className="semester-section">
-                  <h2 className="semester-heading">Semester {semester}</h2>
+                  <h2 className="semester-heading">
+                    <FaUserGraduate /> Semester {semester}
+                  </h2>
                   <div className="students-grid">
                     <div className="students-header">
                       <div className="header-name">Name</div>
@@ -400,15 +487,15 @@ const ViewStudents = () => {
                     {semesterStudents.map(student => (
                       <div key={student._id} className="student-row">
                         <div className="student-name">
-                          <FaUser className="icon" />
+                          <FaUserGraduate />
                           {student.name}
                         </div>
                         <div className="student-email">
-                          <FaEnvelope className="icon" />
+                          <FaEnvelope />
                           {student.email}
                         </div>
                         <div className="student-semester">
-                          Semester {student.semester || 1}
+                          <FaGraduationCap /> {student.semester || 1}
                         </div>
                         <div className="student-actions">
                           <button
@@ -419,21 +506,44 @@ const ViewStudents = () => {
                             <FaQrcode />
                           </button>
 
+                          {/* Common actions for both teacher and admin */}
+                          <Link
+                            to={`/student-attendance/${student._id}`}
+                            className="btn-icon"
+                            title="View Attendance"
+                          >
+                            <FaCalendarAlt />
+                          </Link>
+
+                          {/* Teacher-specific actions */}
                           {user.role === 'teacher' && (
                             <>
-                              <Link
-                                to={`/student-attendance/${student._id}`}
-                                className="btn-icon"
-                                title="View Attendance"
-                              >
-                                <FaCalendarAlt />
-                              </Link>
                               <button
                                 className="btn-icon"
                                 onClick={() => handleEdit(student)}
                                 title="Edit Student"
                               >
-                                <FaEdit />
+                                <FaUserEdit />
+                              </button>
+                              <button
+                                className="btn-icon delete"
+                                onClick={() => handleDelete(student._id)}
+                                title="Delete Student"
+                              >
+                                <FaTrash />
+                              </button>
+                            </>
+                          )}
+
+                          {/* Admin-specific actions */}
+                          {user.role === 'admin' && (
+                            <>
+                              <button
+                                className="btn-icon"
+                                onClick={() => handleEdit(student)}
+                                title="Edit Student"
+                              >
+                                <FaUserEdit />
                               </button>
                               <button
                                 className="btn-icon delete"
@@ -453,8 +563,18 @@ const ViewStudents = () => {
           </div>
         ) : (
           <div className="no-students">
-            <FaUser className="no-students-icon" />
-            <p>No students found.</p>
+            <FaUserGraduate className="no-students-icon" />
+            <p>No students found in the system.</p>
+            {user.role === 'teacher' && (
+              <button className="btn btn-primary" onClick={openAddModal}>
+                <FaUserPlus /> Add Your First Student
+              </button>
+            )}
+            {user.role === 'admin' && (
+              <button className="btn btn-primary" onClick={openAddModal}>
+                <FaUserPlus /> Add New Student
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -463,37 +583,41 @@ const ViewStudents = () => {
       {showQRModal && selectedStudent && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h2>Student QR Code</h2>
-            <div className="student-info">
-              <p><strong>Name:</strong> {selectedStudent.name}</p>
-              <p><strong>Email:</strong> {selectedStudent.email}</p>
-              <p><strong>Branch:</strong> {selectedStudent.branch}</p>
-              <p><strong>Semester:</strong> {selectedStudent.semester || 1}</p>
-            </div>
+            <h2><FaQrcode /> Student QR Code</h2>
+            <div>
+              <div className="student-info">
+                <p><strong>Name:</strong> <FaUserGraduate /> {selectedStudent.name}</p>
+                <p><strong>Email:</strong> <FaEnvelope /> {selectedStudent.email}</p>
+                <p><strong>Branch:</strong> <FaSchool /> {selectedStudent.branch}</p>
+                <p><strong>Semester:</strong> <FaGraduationCap /> {selectedStudent.semester || 1}</p>
+              </div>
 
-            <div className="qr-code-container">
-              {selectedStudent.qrCode ? (
-                <>
-                  <img
-                    src={selectedStudent.qrCode}
-                    alt={`QR Code for ${selectedStudent.name}`}
-                    className="qr-code-image"
-                  />
-                  <button
-                    className="btn btn-primary"
-                    onClick={downloadQRCode}
-                  >
-                    <FaDownload /> Download QR Code
-                  </button>
-                </>
-              ) : (
-                <p className="no-qr-code">No QR code available for this student.</p>
-              )}
-            </div>
+              <div className="qr-code-container">
+                {selectedStudent.qrCode ? (
+                  <>
+                    <img
+                      src={selectedStudent.qrCode}
+                      alt={`QR Code for ${selectedStudent.name}`}
+                      className="qr-code-image"
+                    />
+                    <button
+                      className="btn btn-primary"
+                      onClick={downloadQRCode}
+                    >
+                      <FaDownload /> Download QR Code
+                    </button>
+                  </>
+                ) : (
+                  <p className="no-qr-code">No QR code available for this student.</p>
+                )}
+              </div>
 
-            <button className="btn btn-secondary" onClick={closeModal}>
-              Close
-            </button>
+              <div className="form-actions">
+                <button className="btn btn-secondary" onClick={closeModal}>
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -556,6 +680,25 @@ const ViewStudents = () => {
                 </select>
               </div>
 
+              {user.role === 'admin' && (
+                <div className="form-group">
+                  <label htmlFor="branch">Branch</label>
+                  <select
+                    id="branch"
+                    name="branch"
+                    value={formData.branch}
+                    onChange={handleChange}
+                    required
+                  >
+                    {branches.map(branch => (
+                      <option key={branch.code} value={branch.code}>
+                        {branch.name} ({branch.code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary" disabled={loading}>
                   {loading ? 'Adding...' : 'Add Student'}
@@ -577,34 +720,36 @@ const ViewStudents = () => {
       {showEditModal && selectedStudent && (
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h2>Edit Student</h2>
+            <h2><FaUserEdit /> Edit Student</h2>
             <form onSubmit={handleUpdateStudent}>
               <div className="form-group">
-                <label htmlFor="edit-name">Name</label>
+                <label htmlFor="edit-name"><FaUser /> Student Name</label>
                 <input
                   type="text"
                   id="edit-name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
+                  placeholder="Enter student's full name"
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="edit-email">Email</label>
+                <label htmlFor="edit-email"><FaEnvelope /> Email Address</label>
                 <input
                   type="email"
                   id="edit-email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  placeholder="Enter student's email address"
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="edit-semester">Semester</label>
+                <label htmlFor="edit-semester"><FaGraduationCap /> Current Semester</label>
                 <select
                   id="edit-semester"
                   name="semester"
@@ -618,9 +763,36 @@ const ViewStudents = () => {
                 </select>
               </div>
 
+              {user.role === 'admin' && (
+                <div className="form-group">
+                  <label htmlFor="edit-branch"><FaSchool /> Branch</label>
+                  <select
+                    id="edit-branch"
+                    name="branch"
+                    value={formData.branch}
+                    onChange={handleChange}
+                    required
+                  >
+                    {branches.map(branch => (
+                      <option key={branch.code} value={branch.code}>
+                        {branch.name} ({branch.code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? 'Updating...' : 'Update Student'}
+                  {loading ? (
+                    <>
+                      <FaSpinner className="icon-spin" /> Updating...
+                    </>
+                  ) : (
+                    <>
+                      <FaCheckCircle /> Update Student
+                    </>
+                  )}
                 </button>
                 <button
                   type="button"

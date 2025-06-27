@@ -1,6 +1,8 @@
 import { useState, useContext, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import { FaUserShield, FaEnvelope, FaLock, FaUser, FaSignInAlt, FaExclamationCircle, FaInfoCircle } from 'react-icons/fa';
+import '../styles/AuthPages.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,8 +15,14 @@ const Register = () => {
 
   const [error, setError] = useState('');
   const { user, register, loading, isAuthenticated } = useContext(AuthContext);
+  const [animateIn, setAnimateIn] = useState(false);
 
   const { name, email, password, password2, role } = formData;
+
+  useEffect(() => {
+    // Trigger animation after component mounts
+    setAnimateIn(true);
+  }, []);
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -59,60 +67,83 @@ const Register = () => {
   }
 
   return (
-    <div className="register-page">
-      <div className="form-container">
-        <h1>Admin Registration</h1>
-        <p className="lead">Create a new admin account</p>
-        <div className="admin-notice">
-          <p><strong>Note:</strong> This page is for admin registration only.</p>
-          <p>Students and teachers are added by administrators from the dashboard.</p>
+    <div className="auth-page">
+      {/* Animated Background */}
+      <div className="auth-bg"></div>
+
+      {/* Floating Shapes */}
+      <div className="shape shape-1"></div>
+      <div className="shape shape-2"></div>
+      <div className="shape shape-3"></div>
+      <div className="shape shape-4"></div>
+
+      <div className={`auth-card ${animateIn ? 'animate-in' : ''}`} style={{
+        opacity: animateIn ? 1 : 0,
+        transform: animateIn ? 'translateY(0)' : 'translateY(20px)',
+        transition: 'opacity 0.5s ease-out, transform 0.5s ease-out'
+      }}>
+        <div className="auth-header">
+          <h1><FaUserShield className="icon" /> Admin Registration</h1>
+          <p>Create a new admin account</p>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        <div className="admin-notice">
+          <FaInfoCircle className="icon" />
+          <div>
+            <p><strong>Note:</strong> This page is for admin registration only.</p>
+            <p>Students and teachers are added by administrators from the dashboard.</p>
+          </div>
+        </div>
 
-        <form onSubmit={onSubmit}>
+        {error && (
+          <div className="auth-error">
+            <FaExclamationCircle className="icon" /> {error}
+          </div>
+        )}
+
+        <form className="auth-form" onSubmit={onSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name"><FaUser className="icon" /> Full Name</label>
             <input
               type="text"
               id="name"
               name="name"
               value={name}
               onChange={onChange}
-              placeholder="Enter your name"
+              placeholder="Enter your full name"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email"><FaEnvelope className="icon" /> Email Address</label>
             <input
               type="email"
               id="email"
               name="email"
               value={email}
               onChange={onChange}
-              placeholder="Enter your email"
+              placeholder="Enter your email address"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password"><FaLock className="icon" /> Password</label>
             <input
               type="password"
               id="password"
               name="password"
               value={password}
               onChange={onChange}
-              placeholder="Enter your password"
+              placeholder="Create a password (min. 6 characters)"
               minLength="6"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password2">Confirm Password</label>
+            <label htmlFor="password2"><FaLock className="icon" /> Confirm Password</label>
             <input
               type="password"
               id="password2"
@@ -126,7 +157,7 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="role">Role</label>
+            <label htmlFor="role"><FaUserShield className="icon" /> Role</label>
             <select
               id="role"
               name="role"
@@ -139,14 +170,16 @@ const Register = () => {
             <small className="form-text">This page is for admin registration only.</small>
           </div>
 
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Registering...' : 'Register'}
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? 'Creating Account...' : <><FaUserShield className="icon" /> Create Admin Account</>}
           </button>
         </form>
 
-        <p className="form-footer">
-          Already have an account? <Link to="/login">Login</Link>
-        </p>
+        <div className="auth-footer">
+          <p>
+            Already have an account? <Link to="/login"><FaSignInAlt className="icon" /> Login</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

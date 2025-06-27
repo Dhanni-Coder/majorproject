@@ -1,53 +1,80 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import { FaSignInAlt, FaEnvelope, FaLock, FaQrcode, FaUserPlus, FaExclamationCircle } from 'react-icons/fa';
+import '../styles/AuthPages.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  
+
   const [error, setError] = useState('');
   const { login, loading } = useContext(AuthContext);
-  
+  const [animateIn, setAnimateIn] = useState(false);
+
   const { email, password } = formData;
-  
+
+  useEffect(() => {
+    // Trigger animation after component mounts
+    setAnimateIn(true);
+  }, []);
+
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  
+
   const onSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
     }
-    
+
     // Login user
     const result = await login({
       email,
       password
     });
-    
+
     if (result.error) {
       setError(result.error);
     }
   };
-  
+
   return (
-    <div className="login-page">
-      <div className="form-container">
-        <h1>Login</h1>
-        <p className="lead">Sign in to your account</p>
-        
-        {error && <div className="error-message">{error}</div>}
-        
-        <form onSubmit={onSubmit}>
+    <div className="auth-page">
+      {/* Animated Background */}
+      <div className="auth-bg"></div>
+
+      {/* Floating Shapes */}
+      <div className="shape shape-1"></div>
+      <div className="shape shape-2"></div>
+      <div className="shape shape-3"></div>
+      <div className="shape shape-4"></div>
+
+      <div className={`auth-card ${animateIn ? 'animate-in' : ''}`} style={{
+        opacity: animateIn ? 1 : 0,
+        transform: animateIn ? 'translateY(0)' : 'translateY(20px)',
+        transition: 'opacity 0.5s ease-out, transform 0.5s ease-out'
+      }}>
+        <div className="auth-header">
+          <h1><FaSignInAlt className="icon" /> Login</h1>
+          <p>Sign in to your account</p>
+        </div>
+
+        {error && (
+          <div className="auth-error">
+            <FaExclamationCircle className="icon" /> {error}
+          </div>
+        )}
+
+        <form className="auth-form" onSubmit={onSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email"><FaEnvelope className="icon" /> Email</label>
             <input
               type="email"
               id="email"
@@ -58,9 +85,9 @@ const Login = () => {
               required
             />
           </div>
-          
+
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password"><FaLock className="icon" /> Password</label>
             <input
               type="password"
               id="password"
@@ -71,20 +98,25 @@ const Login = () => {
               required
             />
           </div>
-          
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? 'Logging in...' : <><FaSignInAlt className="icon" /> Login</>}
           </button>
         </form>
-        
-        <p className="form-footer">
-          Don't have an account? <Link to="/register">Register</Link>
-        </p>
-        
-        <div className="alternative-login">
-          <p>Or login with:</p>
-          <Link to="/qr-login" className="btn btn-outline">
-            QR Code
+
+        <div className="auth-footer">
+          <p>
+            Don't have an account? <Link to="/register"><FaUserPlus className="icon" /> Register</Link>
+          </p>
+        </div>
+
+        <div className="auth-divider">
+          <span>Or</span>
+        </div>
+
+        <div className="alt-auth">
+          <Link to="/qr-login" className="alt-auth-btn">
+            <FaQrcode className="icon" /> Login with QR Code
           </Link>
         </div>
       </div>

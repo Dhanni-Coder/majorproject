@@ -45,7 +45,8 @@ const AttendanceSchema = new mongoose.Schema({
   }
 });
 
-// Index for faster queries
-AttendanceSchema.index({ student: 1, date: 1, subject: 1 });
+// Create a unique compound index to prevent duplicate attendance records
+// This ensures that for a given student, date, and subject, there can only be one attendance record
+AttendanceSchema.index({ student: 1, date: 1, subject: 1 }, { unique: true });
 
 module.exports = mongoose.model('Attendance', AttendanceSchema);

@@ -1,0 +1,122 @@
+/* Alert Component Styles */
+.alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius, 8px);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  max-width: 100%;
+}
+
+.alert.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.alert.hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.alert-success {
+  background-color: var(--success-light, #e8f5f3);
+  border-left: 4px solid var(--success-color, #2a9d8f);
+}
+
+.alert-error {
+  background-color: var(--danger-light, #fde8ea);
+  border-left: 4px solid var(--danger-color, #e63946);
+}
+
+.alert-info {
+  background-color: var(--primary-light, #eef2ff);
+  border-left: 4px solid var(--primary-color, #4361ee);
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.alert-icon {
+  font-size: 1.25rem;
+}
+
+.alert-success .alert-icon {
+  color: var(--success-color, #2a9d8f);
+}
+
+.alert-error .alert-icon {
+  color: var(--danger-color, #e63946);
+}
+
+.alert-info .alert-icon {
+  color: var(--primary-color, #4361ee);
+}
+
+.alert-message {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.alert-success .alert-message {
+  color: var(--success-color, #2a9d8f);
+}
+
+.alert-error .alert-message {
+  color: var(--danger-color, #e63946);
+}
+
+.alert-info .alert-message {
+  color: var(--primary-color, #4361ee);
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.alert-success .alert-close {
+  color: var(--success-color, #2a9d8f);
+}
+
+.alert-error .alert-close {
+  color: var(--danger-color, #e63946);
+}
+
+.alert-info .alert-close {
+  color: var(--primary-color, #4361ee);
+}
+
+.alert-close:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: rotate(90deg);
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+  .alert {
+    padding: 0.75rem 1rem;
+  }
+  
+  .alert-content {
+    gap: 0.75rem;
+  }
+  
+  .alert-message {
+    font-size: 0.9rem;
+  }
+}

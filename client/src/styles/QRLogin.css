@@ -1,0 +1,50 @@
+/* QR Login Page */
+.qr-login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  padding: 1rem;
+}
+
+.qr-login-container {
+  background-color: var(--card-bg-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--card-shadow);
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  transition: background-color var(--transition-speed) ease;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='dark'] .qr-login-container {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.qr-login-container h1 {
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.qr-login-container .lead {
+  margin-bottom: 2rem;
+  color: var(--secondary-color);
+}
+
+.alternative-login {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.alternative-login p {
+  margin-bottom: 1rem;
+  color: var(--secondary-color);
+}
+
+/* Dark mode styles */
+[data-theme='dark'] .alternative-login {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}

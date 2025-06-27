@@ -1,7 +1,11 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
+import {
+  FaUserPlus, FaFilter, FaTrash, FaEdit, FaTimes,
+  FaEye, FaEyeSlash, FaSearch, FaChevronDown
+} from 'react-icons/fa';
 import '../styles/ManageUsers.css';
 
 const ManageUsers = () => {
@@ -10,6 +14,7 @@ const ManageUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,40 +23,54 @@ const ManageUsers = () => {
     branch: 'CSE',
     semester: 1
   });
+  const [editUserId, setEditUserId] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
-  const [branchFilter, setBranchFilter] = useState('all');
-  const [showStudentSection, setShowStudentSection] = useState(true);
-  const [showTeacherSection, setShowTeacherSection] = useState(true);
+  const [filters, setFilters] = useState({
+    branch: 'all',
+    role: 'all',
+    search: ''
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      if (!token) return;
-
-      try {
-        setLoading(true);
-        setError('');
-
-        // Set up axios headers
-        axios.defaults.headers.common['x-auth-token'] = token;
-
-        console.log('Fetching users with token:', token);
-        const res = await axios.get('http://localhost:5000/api/users');
-        console.log('Users data received:', res.data);
-        setUsers(res.data);
-        setError('');
-      } catch (err) {
-        console.error('Error fetching users:', err);
-        setError('Failed to load users: ' + (err.response?.data?.msg || err.message));
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
   }, [token]);
 
+  const fetchUsers = async () => {
+    if (!token) return;
+
+    try {
+      setLoading(true);
+      setError('');
+      axios.defaults.headers.common['x-auth-token'] = token;
+      const res = await axios.get('/api/users');
+      setUsers(res.data);
+    } catch (err) {
+      setError('Failed to load users: ' + (err.response?.data?.msg || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesBranch = filters.branch === 'all' || user.branch === filters.branch;
+      const matchesRole = filters.role === 'all' || user.role === filters.role;
+      const matchesSearch = !filters.search ||
+        user.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+        user.email.toLowerCase().includes(filters.search.toLowerCase());
+
+      return matchesBranch && matchesRole && matchesSearch;
+    });
+  }, [users, filters]);
+
+  // Form handlers
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFilterChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -59,6 +78,12 @@ const ManageUsers = () => {
 
     if (!token) {
       setError('Authentication required');
+      return;
+    }
+
+    // Validate password
+    if (!formData.password || formData.password.trim().length < 6) {
+      setError('Password must be at least 6 characters long');
       return;
     }
 
@@ -73,20 +98,36 @@ const ManageUsers = () => {
       let res;
       // Use the specific endpoints for adding students and teachers
       if (formData.role === 'student') {
-        res = await axios.post('http://localhost:5000/api/users/add-student', {
+        res = await axios.post('/api/users/add-student', {
           name: formData.name,
           email: formData.email,
           password: formData.password,
           branch: formData.branch,
           semester: formData.semester
         });
+        console.log('Student creation response:', res.data);
       } else if (formData.role === 'teacher') {
-        res = await axios.post('http://localhost:5000/api/users/add-teacher', {
+        res = await axios.post('/api/users/add-teacher', {
           name: formData.name,
           email: formData.email,
           password: formData.password,
           branch: formData.branch
         });
+        console.log('Teacher creation response:', res.data);
+      } else if (formData.role === 'admin') {
+        // For admin users, use the general user creation endpoint
+        res = await axios.post('/api/users', {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: 'admin',
+          branch: formData.branch
+        });
+        console.log('Admin creation response:', res.data);
+      }
+
+      if (!res || !res.data || !res.data.user) {
+        throw new Error('Invalid response from server');
       }
 
       // Add the new user to the users list
@@ -112,6 +153,89 @@ const ManageUsers = () => {
     }
   };
 
+  const handleEdit = (user) => {
+    // Set the form data with the user's current information
+    setFormData({
+      name: user.name,
+      email: user.email,
+      password: '', // Don't populate password for security reasons
+      role: user.role,
+      branch: user.branch || 'CSE',
+      semester: user.semester || 1
+    });
+
+    // Set the user ID being edited
+    setEditUserId(user._id);
+
+    // Show the edit form
+    setShowEditForm(true);
+
+    // Hide the add form if it's open
+    setShowAddForm(false);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!token) {
+      setError('Authentication required');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      setSuccessMessage('');
+
+      // Set up axios headers
+      axios.defaults.headers.common['x-auth-token'] = token;
+
+      // Create update data object (exclude password if empty)
+      const updateData = {
+        name: formData.name,
+        email: formData.email,
+        branch: formData.branch
+      };
+
+      // Only include password if it's provided (not empty)
+      if (formData.password.trim() !== '') {
+        updateData.password = formData.password;
+      }
+
+      // Include semester only for students
+      if (formData.role === 'student') {
+        updateData.semester = formData.semester;
+      }
+
+      // Send update request
+      const res = await axios.put(`/api/users/${editUserId}`, updateData);
+
+      // Update the user in the users list
+      setUsers(users.map(user =>
+        user._id === editUserId ? { ...user, ...updateData } : user
+      ));
+
+      // Reset form and close edit form
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        role: 'student',
+        branch: 'CSE',
+        semester: 1
+      });
+
+      setShowEditForm(false);
+      setEditUserId(null);
+      setSuccessMessage('User updated successfully!');
+    } catch (err) {
+      console.error('Error updating user:', err);
+      setError(err.response?.data?.msg || 'Error updating user: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!token) {
       setError('Authentication required');
@@ -127,7 +251,7 @@ const ManageUsers = () => {
         // Set up axios headers
         axios.defaults.headers.common['x-auth-token'] = token;
 
-        await axios.delete(`http://localhost:5000/api/users/${id}`);
+        await axios.delete(`/api/users/${id}`);
 
         // Remove the deleted user from the users list
         setUsers(users.filter(user => user._id !== id));
@@ -142,307 +266,275 @@ const ManageUsers = () => {
     }
   };
 
-  // Redirect if user is not an admin
-  if (!currentUser) {
-    console.log('No current user, waiting for auth...');
-    return null; // Wait for auth to complete
-  }
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      role: 'student',
+      branch: 'CSE',
+      semester: 1
+    });
+    setShowAddForm(false);
+    setShowEditForm(false);
+    setEditUserId(null);
+  };
 
-  if (currentUser.role !== 'admin') {
-    console.log('User is not admin, redirecting...', currentUser);
+  if (!currentUser || currentUser.role !== 'admin') {
     return <Navigate to="/dashboard" />;
   }
 
-  console.log('Rendering ManageUsers with:', {
-    currentUser,
-    users: users.length,
-    loading,
-    showStudentSection,
-    showTeacherSection,
-    branchFilter
-  });
-
   return (
-    <div className="manage-users-page">
+    <div className="manage-users-container">
+      {/* Header Section */}
       <div className="page-header">
         <h1>Manage Users</h1>
         <button
-          className="btn btn-primary"
-          onClick={() => setShowAddForm(!showAddForm)}
+          className="btn btn-primary add-user-btn"
+          onClick={() => {
+            setShowAddForm(!showAddForm);
+            setShowEditForm(false);
+          }}
         >
-          {showAddForm ? 'Cancel' : 'Add New User'}
+          <FaUserPlus /> {showAddForm ? 'Cancel' : 'Add User'}
         </button>
       </div>
 
-      <div className="admin-notice">
-        <p><strong>Important:</strong> This is where you can add students and teachers to the system.</p>
-        <p>Click the "Add New User" button to create new student or teacher accounts with name, email, password, and branch.</p>
-        <p>Each user will receive a unique QR code for authentication and attendance tracking.</p>
-      </div>
+      {/* Alert Messages */}
+      {error && <div className="alert alert-danger">{error}</div>}
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
-      {error && <div className="error-message">{error}</div>}
-      {successMessage && <div className="success-message">{successMessage}</div>}
-
-      {showAddForm && (
-        <div className="add-user-form">
-          <h2>{formData.role === 'student' ? 'Add New Student' : 'Add New Teacher'}</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="name">Name <span className="required">*</span></label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Enter name"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email">Email <span className="required">*</span></label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter email"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="password">Password <span className="required">*</span></label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter password (minimum 6 characters)"
-                minLength="6"
-                required
-              />
+      {/* Add/Edit User Form */}
+      {(showAddForm || showEditForm) && (
+        <div className="user-form-container">
+          <div className="user-form-header">
+            <h2>{showEditForm ? 'Edit User' : 'Add New User'}</h2>
+            <button className="close-btn" onClick={resetForm}>
+              <FaTimes />
+            </button>
+          </div>
+          <form onSubmit={showEditForm ? handleUpdate : handleSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="form-control"
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="form-control"
+                />
+              </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="role">Role <span className="required">*</span></label>
+                <label>Password {showEditForm && '(Leave blank to keep current)'}</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required={!showEditForm}
+                  minLength="6"
+                  className="form-control"
+                  placeholder={showEditForm ? "Enter new password (optional)" : "Enter password (min 6 characters)"}
+                />
+              </div>
+              <div className="form-group">
+                <label>Role</label>
                 <select
-                  id="role"
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  required
+                  className="form-control"
+                  disabled={showEditForm} // Can't change role when editing
                 >
                   <option value="student">Student</option>
                   <option value="teacher">Teacher</option>
+                  <option value="admin">Admin</option>
                 </select>
-                <small className="form-text">Select whether this user is a student or teacher.</small>
               </div>
+            </div>
 
+            <div className="form-row">
               <div className="form-group">
-                <label htmlFor="branch">Branch <span className="required">*</span></label>
+                <label>Branch</label>
                 <select
-                  id="branch"
                   name="branch"
                   value={formData.branch}
                   onChange={handleChange}
-                  required
+                  className="form-control"
                 >
-                  <option value="CSE">Computer Science Engineering</option>
-                  <option value="IT">Information Technology</option>
-                  <option value="ME">Mechanical Engineering</option>
-                  <option value="MEA">Mechanical Engineering Auto</option>
-                  <option value="CE">Civil Engineering</option>
-                  <option value="EE">Electronic Engineering</option>
-                  <option value="PHARM">Pharmacy</option>
+                  <option value="CSE">Computer Science Engineering (CSE)</option>
+                  <option value="IT">Information Technology (IT)</option>
+                  <option value="ME">Mechanical Engineering (ME)</option>
+                  <option value="MEA">Mechanical Automobile Engineering (MEA)</option>
+                  <option value="CE">Civil Engineering (CE)</option>
+                  <option value="EE">Electrical Engineering (EE)</option>
+                  <option value="PHARM">Pharmacy (PHARM)</option>
                 </select>
-                <small className="form-text">Select the branch for this user. This is required.</small>
               </div>
-
-              {formData.role === 'student' && (
+              {(formData.role === 'student' || (showEditForm && formData.role === 'student')) && (
                 <div className="form-group">
-                  <label htmlFor="semester">Semester <span className="required">*</span></label>
+                  <label>Semester</label>
                   <select
-                    id="semester"
                     name="semester"
                     value={formData.semester}
                     onChange={handleChange}
-                    required
+                    className="form-control"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
                       <option key={sem} value={sem}>Semester {sem}</option>
                     ))}
                   </select>
-                  <small className="form-text">Select the semester for this student.</small>
                 </div>
               )}
             </div>
 
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loading}
-            >
-              {loading ? 'Adding...' : `Add ${formData.role === 'student' ? 'Student' : 'Teacher'}`}
-            </button>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-success">
+                {showEditForm ? 'Update User' : 'Add User'}
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={resetForm}>
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       )}
 
-      <div className="users-container">
-        <div className="user-filters">
-          <div className="section-toggles">
-            <button
-              className={`toggle-btn ${showStudentSection ? 'active' : ''}`}
-              onClick={() => setShowStudentSection(!showStudentSection)}
-            >
-              {showStudentSection ? 'Hide Students' : 'Show Students'}
-            </button>
-            <button
-              className={`toggle-btn ${showTeacherSection ? 'active' : ''}`}
-              onClick={() => setShowTeacherSection(!showTeacherSection)}
-            >
-              {showTeacherSection ? 'Hide Teachers' : 'Show Teachers'}
-            </button>
-          </div>
-
-          <div className="branch-filter">
-            <label htmlFor="branchSelect">Filter by Branch:</label>
-            <select
-              id="branchSelect"
-              value={branchFilter}
-              onChange={(e) => setBranchFilter(e.target.value)}
-            >
-              <option value="all">All Branches</option>
-              <option value="CSE">Computer Science Engineering</option>
-              <option value="IT">Information Technology</option>
-              <option value="ME">Mechanical Engineering</option>
-              <option value="MEA">Mechanical Engineering Auto</option>
-              <option value="CE">Civil Engineering</option>
-              <option value="EE">Electronic Engineering</option>
-              <option value="PHARM">Pharmacy</option>
-            </select>
-          </div>
+      {/* Filters Section */}
+      <div className="filters-section">
+        <div className="filters-header" onClick={() => setShowFilters(!showFilters)}>
+          <FaFilter /> Filters
+          <FaChevronDown className={`dropdown-icon ${showFilters ? 'open' : ''}`} />
         </div>
 
-        {loading ? (
-          <div className="loading">Loading users...</div>
-        ) : (
-          <div className="sections-container">
-            {/* Students Section */}
-            {showStudentSection && (
-              <div className="user-section">
-                <h3 className="section-title">Students</h3>
-                <div className="branch-badges">
-                  {['all', 'CSE', 'IT', 'ME', 'MEA', 'CE', 'EE', 'PHARM'].map(branch => (
-                    <button
-                      key={branch}
-                      className={`branch-badge ${branchFilter === branch ? 'active' : ''}`}
-                      onClick={() => setBranchFilter(branch)}
-                    >
-                      {branch === 'all' ? 'All Branches' : branch}
-                    </button>
-                  ))}
-                </div>
-                {users.filter(u =>
-                  u.role === 'student' &&
-                  (branchFilter === 'all' || u.branch === branchFilter)
-                ).length > 0 ? (
-                  <div className="users-grid">
-                    <div className="users-header">
-                      <div className="user-name">Name</div>
-                      <div className="user-email">Email</div>
-                      <div className="user-branch">Branch</div>
-                      <div className="user-actions">Actions</div>
-                    </div>
+        {showFilters && (
+          <div className="filters-body">
+            <div className="search-box">
+              <FaSearch className="search-icon" />
+              <input
+                type="text"
+                name="search"
+                placeholder="Search by name or email..."
+                value={filters.search}
+                onChange={handleFilterChange}
+                className="search-input"
+              />
+            </div>
 
-                    {users.filter(u =>
-                      u.role === 'student' &&
-                      (branchFilter === 'all' || u.branch === branchFilter)
-                    ).map(user => (
-                      <div key={user._id} className="user-row">
-                        <div className="user-name">{user.name}</div>
-                        <div className="user-email">{user.email}</div>
-                        <div className="user-branch">{user.branch || 'N/A'}</div>
-                        <div className="user-actions">
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() => handleDelete(user._id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="no-users">
-                    <p>No students found{branchFilter !== 'all' ? ` in ${branchFilter} branch` : ''}.</p>
-                  </div>
-                )}
+            <div className="filter-options">
+              <div className="filter-group">
+                <label>Role:</label>
+                <select
+                  name="role"
+                  value={filters.role}
+                  onChange={handleFilterChange}
+                  className="filter-select"
+                >
+                  <option value="all">All Roles</option>
+                  <option value="student">Students</option>
+                  <option value="teacher">Teachers</option>
+                  <option value="admin">Admins</option>
+                </select>
               </div>
-            )}
 
-            {/* Teachers Section */}
-            {showTeacherSection && (
-              <div className="user-section">
-                <h3 className="section-title">Teachers</h3>
-                <div className="branch-badges">
-                  {['all', 'CSE', 'IT', 'ME', 'MEA', 'CE', 'EE', 'PHARM'].map(branch => (
-                    <button
-                      key={branch}
-                      className={`branch-badge ${branchFilter === branch ? 'active' : ''}`}
-                      onClick={() => setBranchFilter(branch)}
-                    >
-                      {branch === 'all' ? 'All Branches' : branch}
-                    </button>
-                  ))}
-                </div>
-                {users.filter(u =>
-                  u.role === 'teacher' &&
-                  (branchFilter === 'all' || u.branch === branchFilter)
-                ).length > 0 ? (
-                  <div className="users-grid">
-                    <div className="users-header">
-                      <div className="user-name">Name</div>
-                      <div className="user-email">Email</div>
-                      <div className="user-branch">Branch</div>
-                      <div className="user-actions">Actions</div>
-                    </div>
-
-                    {users.filter(u =>
-                      u.role === 'teacher' &&
-                      (branchFilter === 'all' || u.branch === branchFilter)
-                    ).map(user => (
-                      <div key={user._id} className="user-row">
-                        <div className="user-name">{user.name}</div>
-                        <div className="user-email">{user.email}</div>
-                        <div className="user-branch">{user.branch || 'N/A'}</div>
-                        <div className="user-actions">
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() => handleDelete(user._id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="no-users">
-                    <p>No teachers found{branchFilter !== 'all' ? ` in ${branchFilter} branch` : ''}.</p>
-                  </div>
-                )}
+              <div className="filter-group">
+                <label>Branch:</label>
+                <select
+                  name="branch"
+                  value={filters.branch}
+                  onChange={handleFilterChange}
+                  className="filter-select"
+                >
+                  <option value="all">All Branches</option>
+                  <option value="CSE">CSE</option>
+                  <option value="ECE">ECE</option>
+                  <option value="ME">ME</option>
+                  {/* Add more branches as needed */}
+                </select>
               </div>
-            )}
+            </div>
           </div>
         )}
       </div>
+
+      {/* Users Table */}
+      {loading ? (
+        <div className="loading-spinner">Loading...</div>
+      ) : (
+        <div className="users-table-container">
+          <div className="users-count">
+            Showing {filteredUsers.length} of {users.length} users
+          </div>
+
+          <div className="responsive-table">
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Branch</th>
+                  <th>Semester</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="no-users">No users found</td>
+                  </tr>
+                ) : (
+                  filteredUsers.map(user => (
+                    <tr key={user._id}>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>
+                        <span className={`role-badge ${user.role}`}>
+                          {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </span>
+                      </td>
+                      <td>{user.branch || 'N/A'}</td>
+                      <td>{user.role === 'student' ? user.semester : 'N/A'}</td>
+                      <td className="action-buttons">
+                        <button
+                          className="btn-icon edit"
+                          onClick={() => handleEdit(user)}
+                          title="Edit User"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          className="btn-icon delete"
+                          onClick={() => handleDelete(user._id)}
+                          title="Delete User"
+                        >
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

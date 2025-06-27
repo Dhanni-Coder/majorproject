@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
     enum: ['student', 'teacher', 'admin'],
     required: true
   },
+  profilePicture: {
+    type: String,
+    default: null
+  },
   qrCode: {
     type: String,
     default: null
@@ -42,6 +46,14 @@ const UserSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  lastLogin: {
+    type: Date,
+    default: null
+  },
+  lastActivity: {
+    type: String,
+    default: 'Account created'
   }
 });
 
